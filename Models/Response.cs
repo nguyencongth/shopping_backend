@@ -15,6 +15,8 @@
         public List<Customers> arrayCustomer { get; set; }
         public Customers customer { get; set; }
 
+        public Login login { get; set; }
+
         public PaginationInfo Pagination { get; set; }
 
     }

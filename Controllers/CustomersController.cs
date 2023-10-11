@@ -28,12 +28,12 @@ namespace WebServiceShopping.Controllers
         }
         [HttpPost]
         [Route("Login")]
-        public Response login(string email, string password)
+        public Response login(Login login)
         {
             Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
             MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
-            response = connectCustomer.Login(email, password, connection);
+            response = connectCustomer.Login(login, connection);
             return response;
         }
         [HttpGet]

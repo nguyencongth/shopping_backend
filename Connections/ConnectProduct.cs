@@ -79,7 +79,7 @@ namespace WebServiceShopping.Connections
             return response;
         }
 
-        public Response product_dress(MySqlConnection connection, int page, int pageSize, int priceRange)
+        public Response product_dress(MySqlConnection connection, int page, int pageSize)
         {
             Response response = new Response();
             connection.Open();
@@ -92,9 +92,6 @@ namespace WebServiceShopping.Connections
             int startIndex = (page - 1) * pageSize;
             sql.Parameters.AddWithValue("@startIndex", startIndex);
             sql.Parameters.AddWithValue("@pageSize", pageSize);
-
-            // Thêm tham số giá sản phẩm
-            sql.Parameters.AddWithValue("@priceRange", priceRange);
 
             // Thêm tham số OUT để trả về tổng số sản phẩm
             sql.Parameters.Add("@totalProducts", MySqlDbType.Int32).Direction = ParameterDirection.Output;

@@ -15,6 +15,12 @@
         public List<Customers> arrayCustomer { get; set; }
         public Customers customer { get; set; }
 
+        public List<Orders> arrayOrders { get; set; }
+        public Orders orders { get; set; }
+
+        public List<OrderItem> arrayOrderItem { get; set; }
+        public OrderItem orderItem { get; set; }
+
         public Login login { get; set; }
 
         public PaginationInfo Pagination { get; set; }

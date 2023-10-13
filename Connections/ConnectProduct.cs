@@ -7,6 +7,54 @@ namespace WebServiceShopping.Connections
 {
     public class ConnectProduct
     {
+        public Response getProductId(MySqlConnection connection, int idsp)
+        {
+            Response response = new Response();
+            connection.Open();
+            MySqlCommand cmd = new MySqlCommand("sp_productDetail", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("IN_idsp", idsp);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            adapter.Fill(dt);
+            connection.Close();
+
+            List<Product> products = new List<Product>();
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    Product product = new Product();
+                    product.idsp = Convert.ToInt32(dt.Rows[i]["idsp"]);
+                    product.idloaisp = Convert.ToInt32(dt.Rows[i]["idloaisp"]);
+                    product.tensp = Convert.ToString(dt.Rows[i]["tensp"]);
+                    product.gianhap = Convert.ToDecimal(dt.Rows[i]["gianhap"]);
+                    product.giaban = Convert.ToDecimal(dt.Rows[i]["giaban"]);
+                    product.thongtinsp = Convert.ToString(dt.Rows[i]["thongtinsp"]);
+                    product.slsanpham = Convert.ToInt32(dt.Rows[i]["slsanpham"]);
+                    product.ngaynhaphang = Convert.ToDateTime(dt.Rows[i]["ngaynhaphang"]);
+                    product.anhsp = Convert.ToString(dt.Rows[i]["anhsp"]);
+
+                    products.Add(product);
+                }
+            }
+
+            if (products.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Thông tin chi tiết sản phẩm";
+                response.arrayProduct = products;
+            }
+            else
+            {
+                response.StatusCode = 100;
+                response.StatusMessage = "Không tìm thấy sản phẩm nào!";
+                response.arrayProduct = null;
+            }
+            return response;
+        }
         public Response productAll(MySqlConnection connection, int page, int pageSize)
         {
             Response response = new Response();
@@ -39,8 +87,8 @@ namespace WebServiceShopping.Connections
                     product.idsp = Convert.ToInt32(dt.Rows[i]["idsp"]);
                     product.idloaisp = Convert.ToInt32(dt.Rows[i]["idloaisp"]);
                     product.tensp = Convert.ToString(dt.Rows[i]["tensp"]);
-                    product.gianhap = Convert.ToInt32(dt.Rows[i]["gianhap"]);
-                    product.giaban = Convert.ToInt32(dt.Rows[i]["giaban"]);
+                    product.gianhap = Convert.ToDecimal(dt.Rows[i]["gianhap"]);
+                    product.giaban = Convert.ToDecimal(dt.Rows[i]["giaban"]);
                     product.thongtinsp = Convert.ToString(dt.Rows[i]["thongtinsp"]);
                     product.slsanpham = Convert.ToInt32(dt.Rows[i]["slsanpham"]);
                     product.ngaynhaphang = Convert.ToDateTime(dt.Rows[i]["ngaynhaphang"]);
@@ -112,8 +160,8 @@ namespace WebServiceShopping.Connections
                     product.idsp = Convert.ToInt32(dt.Rows[i]["idsp"]);
                     product.idloaisp = Convert.ToInt32(dt.Rows[i]["idloaisp"]);
                     product.tensp = Convert.ToString(dt.Rows[i]["tensp"]);
-                    product.gianhap = Convert.ToInt32(dt.Rows[i]["gianhap"]);
-                    product.giaban = Convert.ToInt32(dt.Rows[i]["giaban"]);
+                    product.gianhap = Convert.ToDecimal(dt.Rows[i]["gianhap"]);
+                    product.giaban = Convert.ToDecimal(dt.Rows[i]["giaban"]);
                     product.thongtinsp = Convert.ToString(dt.Rows[i]["thongtinsp"]);
                     product.slsanpham = Convert.ToInt32(dt.Rows[i]["slsanpham"]);
                     product.ngaynhaphang = Convert.ToDateTime(dt.Rows[i]["ngaynhaphang"]);
@@ -183,8 +231,8 @@ namespace WebServiceShopping.Connections
                     product.idsp = Convert.ToInt32(dt.Rows[i]["idsp"]);
                     product.idloaisp = Convert.ToInt32(dt.Rows[i]["idloaisp"]);
                     product.tensp = Convert.ToString(dt.Rows[i]["tensp"]);
-                    product.gianhap = Convert.ToInt32(dt.Rows[i]["gianhap"]);
-                    product.giaban = Convert.ToInt32(dt.Rows[i]["giaban"]);
+                    product.gianhap = Convert.ToDecimal(dt.Rows[i]["gianhap"]);
+                    product.giaban = Convert.ToDecimal(dt.Rows[i]["giaban"]);
                     product.thongtinsp = Convert.ToString(dt.Rows[i]["thongtinsp"]);
                     product.slsanpham = Convert.ToInt32(dt.Rows[i]["slsanpham"]);
                     product.ngaynhaphang = Convert.ToDateTime(dt.Rows[i]["ngaynhaphang"]);

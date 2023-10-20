@@ -56,7 +56,6 @@ namespace WebServiceShopping.Connections
                     updateTotalAmountCmd.Parameters.AddWithValue("IN_order_id", orderID);
                     updateTotalAmountCmd.ExecuteNonQuery();
 
-                    //int i = OrderCmd.ExecuteNonQuery();
                     transaction.Commit();
                    
                     response.StatusCode = 200;

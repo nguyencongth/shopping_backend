@@ -15,6 +15,9 @@
         public List<Customers> arrayCustomer { get; set; }
         public Customers customer { get; set; }
 
+        public List<Cart> arrayCart { get; set; }
+        public Cart cart { get; set; }
+
         public List<Orders> arrayOrders { get; set; }
         public Orders orders { get; set; }
 
@@ -24,6 +27,6 @@
         public Login login { get; set; }
 
         public PaginationInfo Pagination { get; set; }
-
+        public int id_customer { get; set; }
     }
 }

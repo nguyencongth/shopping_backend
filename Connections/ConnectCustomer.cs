@@ -63,14 +63,16 @@ namespace WebServiceShopping.Connections
             connection.Open();
 
             // Kiểm tra xem email có tồn tại trong cơ sở dữ liệu hay không
-            MySqlCommand checkEmailCmd = new MySqlCommand("SELECT password_hash FROM customer WHERE email = @Email", connection);
+            MySqlCommand checkEmailCmd = new MySqlCommand("SELECT id_customer, password_hash FROM customer WHERE email = @Email", connection);
             checkEmailCmd.Parameters.AddWithValue("@Email", login.email);
+
             using (MySqlDataReader reader = checkEmailCmd.ExecuteReader())
             {
                 if(reader.Read())
                 {
                     // Lấy mật khẩu từ cơ sở dữ liệu
                     string hashedPasswordFromDb = reader.GetString("password_hash");
+                    int idCustomer = reader.GetInt32("id_customer");
 
                     // Kiểm tra mật khẩu
                     if (PasswordHelper.VerifyPassword(login.password, hashedPasswordFromDb))
@@ -78,6 +80,7 @@ namespace WebServiceShopping.Connections
                         // Mật khẩu đúng
                         response.StatusCode = 200;
                         response.StatusMessage = "Đăng nhập thành công.";
+                        response.id_customer = idCustomer;
                     }
                     else
                     {

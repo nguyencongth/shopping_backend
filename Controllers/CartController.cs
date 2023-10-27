@@ -29,15 +29,27 @@ namespace WebServiceShopping.Controllers
         }
 
         [HttpPatch]
-        [Route("updateCartQuanrtity")]
-        public Response UpdateCartQuantity(Cart cart)
+        [Route("updateCartQuantity")]
+        public Response UpdateCartQuantity(int id_customer, int idsp, int newQuantity)
         {
             Response response = new Response();
             ConnectCart connectCart = new ConnectCart();
             MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
-            response = connectCart.UpdateCartQuantity(cart, connection);
+            response = connectCart.UpdateCartQuantity(connection, id_customer, idsp, newQuantity);
             return response;
         }
+
+        [HttpDelete]
+        [Route("deleteCart")]
+        public Response DeleteCart(int customerID)
+        {
+            Response response = new Response();
+            ConnectCart connectCart = new ConnectCart();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectCart.deleteCart(connection, customerID);
+            return response;
+        }
+
         [HttpDelete]
         [Route("deleteCartItem")]
         public Response DeleteCartItem(int customerID, int productID)

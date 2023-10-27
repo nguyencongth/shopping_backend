@@ -22,7 +22,10 @@ namespace WebServiceShopping.Connections
                     OrderCmd.CommandType = CommandType.StoredProcedure;
                     OrderCmd.Parameters.AddWithValue("IN_CustomerId", orders.id_customer);
                     OrderCmd.Parameters.AddWithValue("IN_OrderDate", DateTime.Now);
+                    OrderCmd.Parameters.AddWithValue("IN_shippingAddress", orders.shippingAddress);
                     OrderCmd.Parameters.AddWithValue("IN_TotalAmount", 0);
+                    OrderCmd.Parameters.AddWithValue("IN_paymentMethod", orders.paymentMethod);
+                    OrderCmd.Parameters.AddWithValue("IN_orderStatus", 0);
                     OrderCmd.ExecuteNonQuery();
                     // Lấy ID đơn hàng mới
                     MySqlCommand getOrderIDCmd = new MySqlCommand("SELECT LAST_INSERT_ID()", connection, transaction);

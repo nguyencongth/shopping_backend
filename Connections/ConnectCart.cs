@@ -31,12 +31,12 @@ namespace WebServiceShopping.Connections
                 return null;
             }
         }
-        public Response UpdateCartQuantity(Cart cart, MySqlConnection connection)
+        public Response UpdateCartQuantity(MySqlConnection connection,int id_customer, int idsp, int newQuantity)
         {
             Response response = new Response();
             MySqlCommand checkCartCmd = new MySqlCommand("SELECT COUNT(*) FROM cart WHERE id_customer = @customerID AND idsp = @productID", connection);
-            checkCartCmd.Parameters.AddWithValue("@customerID", cart.id_customer);
-            checkCartCmd.Parameters.AddWithValue("@productID", cart.idsp);
+            checkCartCmd.Parameters.AddWithValue("@customerID", id_customer);
+            checkCartCmd.Parameters.AddWithValue("@productID", idsp);
 
             connection.Open();
 
@@ -45,10 +45,10 @@ namespace WebServiceShopping.Connections
             if (cartCount > 0)
             {
                 // Sản phẩm đã có trong giỏ hàng, cập nhật số lượng
-                MySqlCommand updateCmd = new MySqlCommand("UPDATE Cart SET quantity = quantity + @quantity WHERE id_customer = @customerID AND idsp = @productID", connection);
-                updateCmd.Parameters.AddWithValue("@quantity", cart.quantity);
-                updateCmd.Parameters.AddWithValue("@customerID", cart.id_customer);
-                updateCmd.Parameters.AddWithValue("@productID", cart.idsp);
+                MySqlCommand updateCmd = new MySqlCommand("UPDATE Cart SET quantity = @newQuantity WHERE id_customer = @customerID AND idsp = @productID", connection);
+                updateCmd.Parameters.AddWithValue("@newQuantity", newQuantity);
+                updateCmd.Parameters.AddWithValue("@customerID", id_customer);
+                updateCmd.Parameters.AddWithValue("@productID", idsp);
                 int rowsUpdated = updateCmd.ExecuteNonQuery();
 
                 if (rowsUpdated > 0)
@@ -71,6 +71,30 @@ namespace WebServiceShopping.Connections
             connection.Close();
             return response;
         }
+        public Response deleteCart(MySqlConnection connection, int customerID)
+        {
+            Response response = new Response();
+            MySqlCommand removeCmd = new MySqlCommand("DELETE FROM cart WHERE id_customer = @customerId", connection);
+            removeCmd.Parameters.AddWithValue("@customerId", customerID);
+
+            connection.Open();
+
+            int rowsDeleted = removeCmd.ExecuteNonQuery();
+            if (rowsDeleted > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Xóa tất cả sản phẩm khỏi giỏ hàng thành công.";
+                return response;
+            }
+            else
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Lỗi khi xóa tất sản phẩm khỏi giỏ hàng.";
+            }
+            connection.Close();
+            return response;
+        }
+
         public Response deleteCartItem(MySqlConnection connection, int customerID, int productID)
         {
             Response response = new Response();

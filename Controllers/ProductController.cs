@@ -60,5 +60,16 @@ namespace WebServiceShopping.Controllers
             response = connectProduct.product_shirt(connection, page, pageSize);
             return response;
         }
+
+        [HttpGet]
+        [Route("searchProduct")]
+        public Response searchProduct(string keyword, int page, int pageSize)
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.SearchProduct(connection, keyword, page, pageSize);
+            return response;
+        }
     }
 }

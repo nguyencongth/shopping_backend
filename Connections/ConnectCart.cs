@@ -98,11 +98,10 @@ namespace WebServiceShopping.Connections
         public Response deleteCartItem(MySqlConnection connection, int customerID, int productID)
         {
             Response response = new Response();
+            connection.Open();
             MySqlCommand removeCmd = new MySqlCommand("DELETE FROM cart WHERE id_customer = @customerId AND idsp = @productId", connection);
             removeCmd.Parameters.AddWithValue("@customerId", customerID);
             removeCmd.Parameters.AddWithValue("@productID", productID);
-
-            connection.Open();
 
             int rowsDeleted = removeCmd.ExecuteNonQuery();
             if (rowsDeleted > 0)
@@ -123,6 +122,7 @@ namespace WebServiceShopping.Connections
         public Response GetCartItemsByCustomerId(int customerId, MySqlConnection connection)
         {
             Response response = new Response();
+            connection.Open();
             MySqlCommand getCartItemCmd = new MySqlCommand(
                 "SELECT cart.cartID, cart.id_customer, cart.idsp, cart.quantity, cart.dateAdded, sanpham.anhsp, sanpham.tensp, sanpham.giaban " +
                 "FROM cart " +
@@ -132,8 +132,9 @@ namespace WebServiceShopping.Connections
             MySqlDataAdapter adapter = new MySqlDataAdapter(getCartItemCmd);
 
             DataTable dataTable = new DataTable();
-            connection.Open();
+            
             adapter.Fill(dataTable);
+            connection.Close();
             List<Cart> arrayCart = new List<Cart>();
             if (dataTable.Rows.Count > 0)
             {
@@ -161,8 +162,6 @@ namespace WebServiceShopping.Connections
             {
                 return null;
             }
-            connection.Close();
-            return response;
         }
 
     }

@@ -30,12 +30,12 @@ namespace WebServiceShopping.Controllers
 
         [HttpGet]
         [Route("all")]
-        public Response all(int page, int pageSize)
+        public Response all(int priceRange, int page, int pageSize)
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
             MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
-            response = connectProduct.productAll(connection, page, pageSize);
+            response = connectProduct.productAll(connection, priceRange, page, pageSize);
             return response;
         }
 
@@ -69,6 +69,16 @@ namespace WebServiceShopping.Controllers
             ConnectProduct connectProduct = new ConnectProduct();
             MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectProduct.SearchProduct(connection, keyword, page, pageSize);
+            return response;
+        }
+        [HttpGet]
+        [Route("filterProductsByPrice")]
+        public Response filterProductsByPrice(int priceRange, int page, int pageSize)
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.FilterProductsByPrice(connection, priceRange, page, pageSize);
             return response;
         }
     }

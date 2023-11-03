@@ -146,5 +146,49 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
+
+        public Response getCustomerById(MySqlConnection connection, int CustomerID)
+        {
+            Response response = new Response();
+            connection.Open();
+            MySqlCommand getCustomerById = new MySqlCommand("getCustomerById", connection);
+            getCustomerById.CommandType = CommandType.StoredProcedure;
+            getCustomerById.Parameters.AddWithValue("IN_CustomerID", CustomerID);
+
+            MySqlDataAdapter adapter = new MySqlDataAdapter(getCustomerById);
+
+            DataTable dataTable = new DataTable();
+
+            adapter.Fill(dataTable);
+
+            List<Customers> arrayCustomer = new List<Customers>();
+
+            if(dataTable.Rows.Count > 0)
+            {
+                for(int i = 0; i < dataTable.Rows.Count; i++)
+                {
+                    Customers customer = new Customers();
+                    customer.id_customer = Convert.ToInt32(dataTable.Rows[i]["id_customer"]);
+                    customer.fullname = Convert.ToString(dataTable.Rows[i]["fullname"]);
+                    customer.email = Convert.ToString(dataTable.Rows[i]["email"]);
+                    customer.phonenumber = Convert.ToString(dataTable.Rows[i]["phonenumber"]);
+                    customer.password = Convert.ToString(dataTable.Rows[i]["password_hash"]);
+                    customer.address = Convert.ToString(dataTable.Rows[i]["address"]);
+                    arrayCustomer.Add(customer);
+                }
+            }
+            if(arrayCustomer.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Thông tin người dùng";
+                response.arrayCustomer = arrayCustomer;
+            }
+            else
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Không tìm thấy thông tin người dùng";
+            }
+            return response;
+        }
     }
 }

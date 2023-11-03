@@ -46,5 +46,16 @@ namespace WebServiceShopping.Controllers
             response = connectCustomer.customerAll(connection);
             return response;
         }
+
+        [HttpGet]
+        [Route("getCustomerById")]
+        public Response getCustomerById(int CustomerID)
+        {
+            Response response = new Response();
+            ConnectCustomer connectCustomer = new ConnectCustomer();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectCustomer.getCustomerById(connection, CustomerID);
+            return response;
+        }
     }
 }

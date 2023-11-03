@@ -10,26 +10,57 @@ namespace WebServiceShopping.Connections
         public Response AddToCart(Cart cart, MySqlConnection connection)
         {
             Response response = new Response();
-            MySqlCommand command = new MySqlCommand("sp_add_cart", connection);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("IN_id_customer", cart.id_customer);
-            command.Parameters.AddWithValue("IN_idsp", cart.idsp);
-            command.Parameters.AddWithValue("IN_quantity", cart.quantity);
-            command.Parameters.AddWithValue("IN_dateAdded", DateTime.Now);
-            // Mở kết nối
             connection.Open();
-            int i = command.ExecuteNonQuery();
-            connection.Close();
-            if (i > 0)
+            MySqlCommand checkCartCmd = new MySqlCommand("SELECT COUNT(*) FROM cart WHERE id_customer = @customerID AND idsp = @productID", connection);
+            checkCartCmd.Parameters.AddWithValue("@customerID", cart.id_customer);
+            checkCartCmd.Parameters.AddWithValue("@productID", cart.idsp);
+
+            int cartCount = Convert.ToInt32(checkCartCmd.ExecuteScalar());
+
+            if(cartCount > 0 )
             {
-                response.StatusCode = 200;
-                response.StatusMessage = "Thêm sản phẩm vào giỏ hàng thành công";
-                return response;
+                MySqlCommand updateCmd = new MySqlCommand("UPDATE cart SET quantity = quantity + @newQuantity WHERE id_customer = @customerID and idsp = @productID", connection);
+                updateCmd.Parameters.AddWithValue("@newQuantity", cart.quantity);
+                updateCmd.Parameters.AddWithValue("@customerID", cart.id_customer);
+                updateCmd.Parameters.AddWithValue("@productID", cart.idsp);
+                int rowsUPdated = updateCmd.ExecuteNonQuery();
+
+                if(rowsUPdated > 0 )
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Cập nhật số lượng sản phẩm trong giỏ hàng thành công";
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.StatusMessage = "Lỗi khi cập nhật số lượng sản phẩm trong giỏ hàng";
+                }
             }
             else
             {
-                return null;
+                MySqlCommand command = new MySqlCommand("sp_add_cart", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("IN_id_customer", cart.id_customer);
+                command.Parameters.AddWithValue("IN_idsp", cart.idsp);
+                command.Parameters.AddWithValue("IN_quantity", cart.quantity);
+                command.Parameters.AddWithValue("IN_dateAdded", DateTime.Now);
+                // Mở kết nối
+
+                int i = command.ExecuteNonQuery();
+
+                if (i > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Thêm sản phẩm vào giỏ hàng thành công";
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.StatusMessage = "Lỗi khi thêm sản phẩm vào giỏ hàng";
+                }
             }
+            connection.Close();
+            return response;
         }
         public Response UpdateCartQuantity(MySqlConnection connection,int id_customer, int idsp, int newQuantity)
         {
@@ -136,6 +167,8 @@ namespace WebServiceShopping.Connections
             adapter.Fill(dataTable);
             connection.Close();
             List<Cart> arrayCart = new List<Cart>();
+            List<Cart> cartEmpty = new List<Cart>();
+
             if (dataTable.Rows.Count > 0)
             {
                 for (int i = 0; i < dataTable.Rows.Count; i++)
@@ -160,7 +193,8 @@ namespace WebServiceShopping.Connections
             }
             else
             {
-                return null;
+                response.arrayCart = cartEmpty;
+                return response;
             }
         }
 

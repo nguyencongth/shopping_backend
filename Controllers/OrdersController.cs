@@ -27,5 +27,16 @@ namespace WebServiceShopping.Controllers
             response = connectOrder.CreateOrder(connection, order);
             return response;
         }
+
+        [HttpGet]
+        [Route("getOrder")]
+        public Response getOrder(int customerID)
+        {
+            Response response = new Response();
+            ConnectOrder connectOrder = new ConnectOrder();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectOrder.getOrderByIdCustomer(connection, customerID);
+            return response;
+        }
     }
 }

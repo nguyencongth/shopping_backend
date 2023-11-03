@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Asn1.X509;
 using System.Data;
 using System.Transactions;
 using WebServiceShopping.Models;
@@ -73,6 +74,63 @@ namespace WebServiceShopping.Connections
             }
             return response;
 
+        }
+
+        public Response getOrderByIdCustomer(MySqlConnection connection, int customerID)
+        {
+            Response response = new Response();
+            List<Orders> orders = new List<Orders>();
+            connection.Open();
+            MySqlCommand getOrderCmd = new MySqlCommand("getOrderByCustomerID", connection);
+            getOrderCmd.CommandType = CommandType.StoredProcedure;
+            getOrderCmd.Parameters.AddWithValue("IN_CustomerID", customerID);
+            using (MySqlDataReader reader = getOrderCmd.ExecuteReader())
+            {
+                Orders currentOrder = null;
+
+                while (reader.Read())
+                {
+                    int orderID = reader.GetInt32("order_id");
+
+                    if (currentOrder == null || currentOrder.order_id != orderID)
+                    {
+                        currentOrder = new Orders
+                        {
+                            order_id = orderID,
+                            id_customer = reader.GetInt32("id_customer"),
+                            order_date = reader.GetDateTime("order_date"),
+                            shippingAddress = reader.GetString("shippingAddress"),
+                            total_amount = reader.GetDecimal("total_amount"),
+                            paymentMethod = reader.GetString("paymentMethod"),
+                            orderStatus = reader.GetInt32("orderStatus"),
+                            orderItems = new List<OrderItem>()
+                        };
+
+                        orders.Add(currentOrder);
+                    }
+
+                    currentOrder.orderItems.Add(new OrderItem
+                    {
+                        order_item_id = reader.GetInt32("order_item_id"),
+                        idsp = reader.GetInt32("idsp"),
+                        quantity = reader.GetInt32("quantity"),
+                        subtotal = reader.GetDecimal("subtotal")
+                    });
+                }
+            }
+            if (orders.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Danh sách đơn hàng";
+                response.arrayOrders = orders;
+            }
+            else
+            {
+                response.StatusCode = 404;
+                response.StatusMessage = "Không tìm thấy đơn hàng";
+            }
+
+            return response;
         }
         Product GetProductInfo(MySqlConnection connection, int productId)
         {

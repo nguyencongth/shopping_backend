@@ -76,6 +76,42 @@ namespace WebServiceShopping.Connections
 
         }
 
+        public Response deleteOrder(MySqlConnection connection, int orderID)
+        {
+            Response response = new Response();
+
+            try
+            {
+                connection.Open();
+
+                MySqlTransaction transaction = connection.BeginTransaction();
+
+                MySqlCommand deleteOrderItems = new MySqlCommand("DELETE FROM order_item WHERE order_id = @orderID", connection, transaction);
+                deleteOrderItems.Parameters.AddWithValue("@orderID", orderID);
+                deleteOrderItems.ExecuteNonQuery();
+
+                MySqlCommand deleteOrder = new MySqlCommand("DELETE FROM orders WHERE order_id = @orderID", connection, transaction);
+                deleteOrder.Parameters.AddWithValue("@orderID", orderID);
+                deleteOrder.ExecuteNonQuery();
+
+                transaction.Commit();
+
+                response.StatusCode = 200;
+                response.StatusMessage = "Xóa đơn hàng thành công.";
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Lỗi khi xóa đơn hàng. " + ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return response;
+        }
+
         public Response getOrderByIdCustomer(MySqlConnection connection, int customerID)
         {
             Response response = new Response();

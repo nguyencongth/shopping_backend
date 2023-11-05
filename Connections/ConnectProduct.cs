@@ -61,8 +61,6 @@ namespace WebServiceShopping.Connections
         {
             Response response = new Response();
             connection.Open();
-            //string query = "Select * from sanpham";
-            //MySqlCommand sql = new MySqlCommand("sp_sanpham_all", connection);
             MySqlCommand sql = new MySqlCommand("sp_filter_products_by_price", connection);
             sql.CommandType = CommandType.StoredProcedure;
 
@@ -80,7 +78,6 @@ namespace WebServiceShopping.Connections
             DataTable dt = new DataTable();
             
             adapter.Fill(dt);
-            connection.Close();
 
             List<Product> products = new List<Product>();
             if(dt.Rows.Count > 0 )
@@ -127,6 +124,7 @@ namespace WebServiceShopping.Connections
                 response.arrayProduct = null;
                 response.Pagination = null;
             }
+            connection.Close();
             return response;
         }
 
@@ -134,8 +132,6 @@ namespace WebServiceShopping.Connections
         {
             Response response = new Response();
             connection.Open();
-            //string query = "Select * from sanpham";
-            //MySqlCommand sql = new MySqlCommand("sp_sanpham_all", connection);
             MySqlCommand sql = new MySqlCommand("sp_sanpham_dress_paginated", connection);
             sql.CommandType = CommandType.StoredProcedure;
 
@@ -152,8 +148,6 @@ namespace WebServiceShopping.Connections
             DataTable dt = new DataTable();
 
             adapter.Fill(dt);
-            connection.Close();
-
             List<Product> products = new List<Product>();
             if (dt.Rows.Count > 0)
             {
@@ -200,6 +194,7 @@ namespace WebServiceShopping.Connections
                 response.arrayProduct = null;
                 response.Pagination = null;
             }
+            connection.Close();
             return response;
         }
 
@@ -223,7 +218,6 @@ namespace WebServiceShopping.Connections
             DataTable dt = new DataTable();
 
             adapter.Fill(dt);
-            connection.Close();
 
             List<Product> products = new List<Product>();
             if (dt.Rows.Count > 0)
@@ -271,6 +265,7 @@ namespace WebServiceShopping.Connections
                 response.arrayProduct = null;
                 response.Pagination = null;
             }
+            connection.Close();
             return response;
         }
         public Response SearchProduct(MySqlConnection connection, string keyword, int page, int pageSize)

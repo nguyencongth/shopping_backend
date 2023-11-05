@@ -38,5 +38,15 @@ namespace WebServiceShopping.Controllers
             response = connectOrder.getOrderByIdCustomer(connection, customerID);
             return response;
         }
+        [HttpDelete]
+        [Route("deleteOrder")]
+        public Response deleteOrder(int orderID)
+        {
+            Response response = new Response();
+            ConnectOrder connectOrder = new ConnectOrder();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectOrder.deleteOrder(connection, orderID);
+            return response;
+        }
     }
 }

@@ -188,6 +188,7 @@ namespace WebServiceShopping.Connections
                 response.StatusCode = 400;
                 response.StatusMessage = "Không tìm thấy thông tin người dùng";
             }
+            connection.Close();
             return response;
         }
     }

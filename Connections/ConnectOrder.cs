@@ -115,8 +115,8 @@ namespace WebServiceShopping.Connections
         public Response getOrderByIdCustomer(MySqlConnection connection, int customerID)
         {
             Response response = new Response();
-            List<Orders> orders = new List<Orders>();
             connection.Open();
+            List<Orders> orders = new List<Orders>();
             MySqlCommand getOrderCmd = new MySqlCommand("getOrderByCustomerID", connection);
             getOrderCmd.CommandType = CommandType.StoredProcedure;
             getOrderCmd.Parameters.AddWithValue("IN_CustomerID", customerID);
@@ -165,7 +165,37 @@ namespace WebServiceShopping.Connections
                 response.StatusCode = 404;
                 response.StatusMessage = "Không tìm thấy đơn hàng";
             }
+            connection.Close();
+            return response;
+        }
+        public Response updateOrderStatus(MySqlConnection connection,int orderId, int newOrderStatus)
+        {
+            Response response = new Response();
 
+            try
+            {
+                connection.Open();
+
+                MySqlCommand updateOrderStatus = new MySqlCommand("UPDATE orders SET orderStatus = @newOrderStatus WHERE order_id = @orderId", connection);
+                updateOrderStatus.Parameters.AddWithValue("@orderId", orderId);
+                updateOrderStatus.Parameters.AddWithValue("@newOrderStatus", newOrderStatus);
+
+                int rowUpdate = updateOrderStatus.ExecuteNonQuery();
+                if(rowUpdate > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Cập nhật trạng thái đơn hàng thành công.";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Lỗi khi cập nhật trạng thái đơn hàng. " + ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
             return response;
         }
         Product GetProductInfo(MySqlConnection connection, int productId)

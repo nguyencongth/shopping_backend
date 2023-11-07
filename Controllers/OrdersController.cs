@@ -48,5 +48,16 @@ namespace WebServiceShopping.Controllers
             response = connectOrder.deleteOrder(connection, orderID);
             return response;
         }
+
+        [HttpPatch]
+        [Route("updateOrderStatus")]
+        public Response updateOrderStatus(int orderId, int newOrderStatus)
+        {
+            Response response = new Response();
+            ConnectOrder connectOrder = new ConnectOrder();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectOrder.updateOrderStatus(connection, orderId, newOrderStatus);
+            return response;
+        }
     }
 }

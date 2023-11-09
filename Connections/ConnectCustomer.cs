@@ -3,6 +3,10 @@ using System.Data;
 using MySql.Data.MySqlClient;
 using WebServiceShopping.Models;
 using WebServiceShopping.Hash;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace WebServiceShopping.Connections
 {
@@ -77,10 +81,34 @@ namespace WebServiceShopping.Connections
                     // Kiểm tra mật khẩu
                     if (PasswordHelper.VerifyPassword(login.password, hashedPasswordFromDb))
                     {
+                        // Các ký tự có thể dùng
+                        var validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?_-";
+                        // Sinh chuỗi ngẫu nhiên
+                        var random = new Random();
+                        var secretKey = new string(
+                          Enumerable.Repeat(validChars, 64).Select(s => s[random.Next(s.Length)]).ToArray());
+
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var tokenKey = Encoding.UTF8.GetBytes(secretKey);
+                        var tokenDescriptor = new SecurityTokenDescriptor
+                        {
+                            Subject = new ClaimsIdentity(new Claim[]
+                            {
+                                new Claim(ClaimTypes.Name, login.email)
+                            }),
+                            Expires = DateTime.UtcNow.AddHours(1),
+                            SigningCredentials = new SigningCredentials(
+                                new SymmetricSecurityKey(tokenKey),
+                                SecurityAlgorithms.HmacSha256Signature)
+
+                        };
+                        var token = tokenHandler.CreateToken(tokenDescriptor);
+
                         // Mật khẩu đúng
                         response.StatusCode = 200;
                         response.StatusMessage = "Đăng nhập thành công.";
                         response.id_customer = idCustomer;
+                        response.Token = tokenHandler.WriteToken(token);
                     }
                     else
                     {

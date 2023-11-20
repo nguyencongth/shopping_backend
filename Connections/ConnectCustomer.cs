@@ -66,7 +66,6 @@ namespace WebServiceShopping.Connections
             Response response = new Response();
             connection.Open();
 
-            // Kiểm tra xem email có tồn tại trong cơ sở dữ liệu hay không
             MySqlCommand checkEmailCmd = new MySqlCommand("SELECT id_customer, password_hash FROM customer WHERE email = @Email", connection);
             checkEmailCmd.Parameters.AddWithValue("@Email", login.email);
 
@@ -74,16 +73,12 @@ namespace WebServiceShopping.Connections
             {
                 if(reader.Read())
                 {
-                    // Lấy mật khẩu từ cơ sở dữ liệu
                     string hashedPasswordFromDb = reader.GetString("password_hash");
                     int idCustomer = reader.GetInt32("id_customer");
 
-                    // Kiểm tra mật khẩu
                     if (PasswordHelper.VerifyPassword(login.password, hashedPasswordFromDb))
                     {
-                        // Các ký tự có thể dùng
                         var validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?_-";
-                        // Sinh chuỗi ngẫu nhiên
                         var random = new Random();
                         var secretKey = new string(
                           Enumerable.Repeat(validChars, 64).Select(s => s[random.Next(s.Length)]).ToArray());
@@ -103,8 +98,6 @@ namespace WebServiceShopping.Connections
 
                         };
                         var token = tokenHandler.CreateToken(tokenDescriptor);
-
-                        // Mật khẩu đúng
                         response.StatusCode = 200;
                         response.StatusMessage = "Đăng nhập thành công.";
                         response.id_customer = idCustomer;
@@ -112,14 +105,12 @@ namespace WebServiceShopping.Connections
                     }
                     else
                     {
-                        // Mật khẩu không đúng
                         response.StatusCode = 100;
                         response.StatusMessage = "Mật khẩu không hợp lệ.";
                     }
                 }
                 else
                 {
-                    // Email không tồn tại
                     response.StatusCode = 100;
                     response.StatusMessage = "Email không tồn tại.";
                 }
@@ -136,11 +127,9 @@ namespace WebServiceShopping.Connections
             cmd.CommandType= CommandType.StoredProcedure;
             MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
 
-            // Sau khi lấy xong dữ liệu ta sẽ tạo ra 1 bảng dữ liệu mới
             DataTable dataTable = new DataTable();
             adapter.Fill(dataTable);
             connection.Close();
-            // Khởi tạo mảng hứng dữ liệu
             List<Customers> arrayCustomer = new List<Customers>();
             if (dataTable.Rows.Count > 0)
             {
@@ -153,21 +142,17 @@ namespace WebServiceShopping.Connections
                     customer.phonenumber = Convert.ToString(dataTable.Rows[i]["phonenumber"]);
                     customer.password = Convert.ToString(dataTable.Rows[i]["password_hash"]);
                     customer.address = Convert.ToString(dataTable.Rows[i]["address"]);
-                    // Gán dữ liệu vào mảng
                     arrayCustomer.Add(customer);
                 }
             }
-            // Kiểm tra nếu mảng có dữ liệu
             if (arrayCustomer.Count > 0)
             {
-                // Thông báo thành công
                 response.StatusCode = 200;
                 response.StatusMessage = "Danh sách tất cả khách hàng";
                 response.arrayCustomer = arrayCustomer;
             }
             else
             {
-                // Thông báo thất bại
                 response.StatusCode = 100;
                 response.StatusMessage = "Không tìm được khách hàng nào !";
                 response.arrayCustomer = null;

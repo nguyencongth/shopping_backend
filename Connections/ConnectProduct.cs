@@ -64,13 +64,11 @@ namespace WebServiceShopping.Connections
             MySqlCommand sql = new MySqlCommand("sp_filter_products_by_price", connection);
             sql.CommandType = CommandType.StoredProcedure;
 
-            // Thêm tham số phân trang
             int startIndex = (page - 1) * pageSize;
             sql.Parameters.AddWithValue("@priceRange", priceRange);
             sql.Parameters.AddWithValue("@startIndex", startIndex);
             sql.Parameters.AddWithValue("@pageSize", pageSize);
 
-            // Thêm tham số OUT để trả về tổng số sản phẩm
             sql.Parameters.Add("@totalProducts", MySqlDbType.Int32).Direction = ParameterDirection.Output;
 
             MySqlDataAdapter adapter = new MySqlDataAdapter(sql);
@@ -98,10 +96,8 @@ namespace WebServiceShopping.Connections
                 }
             }
 
-            // Lấy giá trị tổng số sản phẩm từ tham số OUT
             int totalProducts = Convert.ToInt32(sql.Parameters["@totalProducts"].Value);
 
-            // Tạo thông tin phân trang
             PaginationInfo paginationInfo = new PaginationInfo
             {
                 CurrentPage = page,
@@ -135,12 +131,10 @@ namespace WebServiceShopping.Connections
             MySqlCommand sql = new MySqlCommand("sp_sanpham_dress_paginated", connection);
             sql.CommandType = CommandType.StoredProcedure;
 
-            // Thêm tham số phân trang
             int startIndex = (page - 1) * pageSize;
             sql.Parameters.AddWithValue("@startIndex", startIndex);
             sql.Parameters.AddWithValue("@pageSize", pageSize);
 
-            // Thêm tham số OUT để trả về tổng số sản phẩm
             sql.Parameters.Add("@totalProducts", MySqlDbType.Int32).Direction = ParameterDirection.Output;
 
             MySqlDataAdapter adapter = new MySqlDataAdapter(sql);
@@ -168,10 +162,8 @@ namespace WebServiceShopping.Connections
                 }
             }
 
-            // Lấy giá trị tổng số sản phẩm từ tham số OUT
             int totalProducts = Convert.ToInt32(sql.Parameters["@totalProducts"].Value);
 
-            // Tạo thông tin phân trang
             PaginationInfo paginationInfo = new PaginationInfo
             {
                 CurrentPage = page,
@@ -205,12 +197,10 @@ namespace WebServiceShopping.Connections
             MySqlCommand sql = new MySqlCommand("sp_sanpham_shirt_paginated", connection);
             sql.CommandType = CommandType.StoredProcedure;
 
-            // Thêm tham số phân trang
             int startIndex = (page - 1) * pageSize;
             sql.Parameters.AddWithValue("@startIndex", startIndex);
             sql.Parameters.AddWithValue("@pageSize", pageSize);
 
-            // Thêm tham số OUT để trả về tổng số sản phẩm
             sql.Parameters.Add("@totalProducts", MySqlDbType.Int32).Direction = ParameterDirection.Output;
 
             MySqlDataAdapter adapter = new MySqlDataAdapter(sql);
@@ -239,10 +229,8 @@ namespace WebServiceShopping.Connections
                 }
             }
 
-            // Lấy giá trị tổng số sản phẩm từ tham số OUT
             int totalProducts = Convert.ToInt32(sql.Parameters["@totalProducts"].Value);
 
-            // Tạo thông tin phân trang
             PaginationInfo paginationInfo = new PaginationInfo
             {
                 CurrentPage = page,
@@ -308,10 +296,8 @@ namespace WebServiceShopping.Connections
                 }
             }
 
-            // Lấy giá trị tổng số sản phẩm từ tham số OUT
             int totalProducts = Convert.ToInt32(sql.Parameters["@totalProducts"].Value);
 
-            // Tạo thông tin phân trang
             PaginationInfo paginationInfo = new PaginationInfo
             {
                 CurrentPage = page,
@@ -376,10 +362,8 @@ namespace WebServiceShopping.Connections
                 }
             }
 
-            // Lấy giá trị tổng số sản phẩm từ tham số OUT
             int totalProducts = Convert.ToInt32(sql.Parameters["@totalProducts"].Value);
 
-            // Tạo thông tin phân trang
             PaginationInfo paginationInfo = new PaginationInfo
             {
                 CurrentPage = page,

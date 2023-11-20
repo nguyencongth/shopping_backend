@@ -44,7 +44,6 @@ namespace WebServiceShopping.Connections
                 command.Parameters.AddWithValue("IN_idsp", cart.idsp);
                 command.Parameters.AddWithValue("IN_quantity", cart.quantity);
                 command.Parameters.AddWithValue("IN_dateAdded", DateTime.Now);
-                // Mở kết nối
 
                 int i = command.ExecuteNonQuery();
 
@@ -75,7 +74,6 @@ namespace WebServiceShopping.Connections
 
             if (cartCount > 0)
             {
-                // Sản phẩm đã có trong giỏ hàng, cập nhật số lượng
                 MySqlCommand updateCmd = new MySqlCommand("UPDATE Cart SET quantity = @newQuantity WHERE id_customer = @customerID AND idsp = @productID", connection);
                 updateCmd.Parameters.AddWithValue("@newQuantity", newQuantity);
                 updateCmd.Parameters.AddWithValue("@customerID", id_customer);

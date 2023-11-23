@@ -47,6 +47,17 @@ namespace WebServiceShopping.Controllers
             return response;
         }
 
+        [HttpPatch]
+        [Route("updateInfo")]
+        public Response updateInfo(Customers customer)
+        {
+            Response response = new Response();
+            ConnectCustomer connectCustomer = new ConnectCustomer();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectCustomer.updateInfo(customer, connection);
+            return response;
+        }
+
         [HttpGet]
         [Route("getCustomerById")]
         public Response getCustomerById(int CustomerID)

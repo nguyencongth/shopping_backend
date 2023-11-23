@@ -159,7 +159,42 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
+        public Response updateInfo(Customers customer, MySqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                MySqlCommand updateCmd = new MySqlCommand("sp_update_info", connection);
+                updateCmd.CommandType = CommandType.StoredProcedure;
+                updateCmd.Parameters.AddWithValue("IN_FullName", customer.fullname);
+                updateCmd.Parameters.AddWithValue("IN_Email", customer.email);
+                updateCmd.Parameters.AddWithValue("IN_PhoneNumber", customer.phonenumber);
+                updateCmd.Parameters.AddWithValue("IN_Address", customer.address);
+                updateCmd.Parameters.AddWithValue("IN_CustomerID", customer.id_customer);
 
+                int rowsAffected = updateCmd.ExecuteNonQuery();
+                connection.Close();
+                if(rowsAffected > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Cập nhật tài khoản thành công.";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Lỗi khi cập nhật tài khoản." + ex.Message;
+            }
+            finally
+            {
+                if(connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+            return response;
+        }
         public Response getCustomerById(MySqlConnection connection, int CustomerID)
         {
             Response response = new Response();

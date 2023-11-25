@@ -57,7 +57,16 @@ namespace WebServiceShopping.Controllers
             response = connectCustomer.updateInfo(customer, connection);
             return response;
         }
-
+        [HttpPatch]
+        [Route("changePassword")]
+        public Response changePassword(int customerID, string currentPassword, string newPassword, string confirmNewPassword)
+        {
+            Response response = new Response();
+            ConnectCustomer connectCustomer = new ConnectCustomer();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectCustomer.changePassword(customerID, currentPassword, newPassword, confirmNewPassword, connection);
+            return response;
+        }
         [HttpGet]
         [Route("getCustomerById")]
         public Response getCustomerById(int CustomerID)

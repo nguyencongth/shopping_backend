@@ -195,6 +195,55 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
+        public Response changePassword(int customerID, string currentPassword, string newPassword, string confirmNewPassword, MySqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                MySqlCommand checkPasswordCmd = new MySqlCommand("Select password_hash From customer Where id_customer = @customerID", connection);
+                checkPasswordCmd.Parameters.AddWithValue("@customerID", customerID);
+                string hashedPasswordFromDb = Convert.ToString(checkPasswordCmd.ExecuteScalar());
+                if(PasswordHelper.VerifyPassword(currentPassword, hashedPasswordFromDb))
+                {
+                    if(newPassword == confirmNewPassword)
+                    {
+                        string newHashedPassword = PasswordHelper.HashPassword(newPassword);
+                        MySqlCommand updatePasswordCmd = new MySqlCommand("Update customer SET password_hash = @NewPassword Where id_customer = @customerID", connection);
+                        updatePasswordCmd.Parameters.AddWithValue("@NewPassword", newHashedPassword);
+                        updatePasswordCmd.Parameters.AddWithValue("@customerID", customerID);
+                        updatePasswordCmd.ExecuteNonQuery();
+
+                        response.StatusCode = 200;
+                        response.StatusMessage = "Thay đổi mật khẩu thành công";
+                    }
+                    else
+                    {
+                        response.StatusCode = 400;
+                        response.StatusMessage = "Mật khẩu xác nhận không chính xác";
+                    }
+                }
+                else
+                {
+                    response.StatusCode = 401;
+                    response.StatusMessage = "Mật khẩu hiện tại không chính xác";
+                }
+
+            }
+            catch(Exception ex) {
+                response.StatusCode = 400;
+                response.StatusMessage = ex.Message;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+            connection.Close();
+            return response;
+        }
         public Response getCustomerById(MySqlConnection connection, int CustomerID)
         {
             Response response = new Response();

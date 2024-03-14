@@ -124,6 +124,75 @@ namespace WebServiceShopping.Connections
             return response;
         }
 
+        public Response productByCategoryId(MySqlConnection connection,int categoryId, int priceRange, int page, int pageSize)
+        {
+            Response response = new Response();
+            connection.Open();
+            MySqlCommand sql = new MySqlCommand("getProductByCategoryId", connection);
+            sql.CommandType = CommandType.StoredProcedure;
+
+            sql.Parameters.AddWithValue("@categoryId", categoryId);
+            int startIndex = (page - 1) * pageSize;
+            sql.Parameters.AddWithValue("@priceRange", priceRange);
+            sql.Parameters.AddWithValue("@startIndex", startIndex);
+            sql.Parameters.AddWithValue("@pageSize", pageSize);
+
+            sql.Parameters.Add("@totalProducts", MySqlDbType.Int32).Direction = ParameterDirection.Output;
+
+            MySqlDataAdapter adapter = new MySqlDataAdapter(sql);
+
+            DataTable dt = new DataTable();
+
+            adapter.Fill(dt);
+
+            List<Product> products = new List<Product>();
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    Product product = new Product();
+                    product.idsp = Convert.ToInt32(dt.Rows[i]["idsp"]);
+                    product.idloaisp = Convert.ToInt32(dt.Rows[i]["idloaisp"]);
+                    product.tensp = Convert.ToString(dt.Rows[i]["tensp"]);
+                    product.gianhap = Convert.ToDecimal(dt.Rows[i]["gianhap"]);
+                    product.giaban = Convert.ToDecimal(dt.Rows[i]["giaban"]);
+                    product.thongtinsp = Convert.ToString(dt.Rows[i]["thongtinsp"]);
+                    product.slsanpham = Convert.ToInt32(dt.Rows[i]["slsanpham"]);
+                    product.ngaynhaphang = Convert.ToDateTime(dt.Rows[i]["ngaynhaphang"]);
+                    product.anhsp = Convert.ToString(dt.Rows[i]["anhsp"]);
+
+                    products.Add(product);
+                }
+            }
+
+            int totalProducts = Convert.ToInt32(sql.Parameters["@totalProducts"].Value);
+
+            PaginationInfo paginationInfo = new PaginationInfo
+            {
+                CurrentPage = page,
+                ItemsPerPage = pageSize,
+                TotalItems = totalProducts,
+                TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize)
+            };
+
+            if (products.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Danh sách tất cả sản phẩm";
+                response.arrayProduct = products;
+                response.Pagination = paginationInfo;
+            }
+            else
+            {
+                response.StatusCode = 100;
+                response.StatusMessage = "Không tìm thấy sản phẩm nào!";
+                response.arrayProduct = null;
+                response.Pagination = null;
+            }
+            connection.Close();
+            return response;
+        }
+
         public Response product_dress(MySqlConnection connection, int page, int pageSize)
         {
             Response response = new Response();

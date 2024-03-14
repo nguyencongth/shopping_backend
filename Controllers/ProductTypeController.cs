@@ -27,5 +27,16 @@ namespace WebServiceShopping.Controllers
             response = connectProductType.productTpyeAll(connection);
             return response;
         }
+
+        [HttpGet]
+        [Route("getCategoryById")]
+        public Response getCategoryById(int categoryId)
+        {
+            Response response = new Response();
+            ConnectProductType connectProductType = new ConnectProductType();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice").ToString());
+            response = connectProductType.getCategoryById(connection, categoryId);
+            return response;
+        }
     }
 }

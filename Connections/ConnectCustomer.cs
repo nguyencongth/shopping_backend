@@ -7,6 +7,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using System.Net.Mail;
+using System.Net;
 
 namespace WebServiceShopping.Connections
 {
@@ -16,12 +18,12 @@ namespace WebServiceShopping.Connections
         {
             Response response = new Response();
             connection.Open();
-            
+
             MySqlCommand checkEmailCmd = new MySqlCommand("sp_checkEmail", connection);
             checkEmailCmd.CommandType = CommandType.StoredProcedure;
             checkEmailCmd.Parameters.AddWithValue("emailValue", customer.email);
             int customerCount = Convert.ToInt32(checkEmailCmd.ExecuteScalar());
-            if(customerCount > 0)
+            if (customerCount > 0)
             {
                 connection.Close();
                 response.StatusCode = 100;
@@ -43,7 +45,7 @@ namespace WebServiceShopping.Connections
 
             cmd.Parameters.AddWithValue("address", customer.address);
 
-            
+
             int i = cmd.ExecuteNonQuery();
             connection.Close();
             if (i > 0)
@@ -57,7 +59,7 @@ namespace WebServiceShopping.Connections
                 response.StatusMessage = "Đăng ký thất bại";
             }
             return response;
-            
+
 
         }
 
@@ -71,7 +73,7 @@ namespace WebServiceShopping.Connections
 
             using (MySqlDataReader reader = checkEmailCmd.ExecuteReader())
             {
-                if(reader.Read())
+                if (reader.Read())
                 {
                     string hashedPasswordFromDb = reader.GetString("password_hash");
                     int idCustomer = reader.GetInt32("id_customer");
@@ -118,13 +120,13 @@ namespace WebServiceShopping.Connections
             connection.Close();
             return response;
         }
-        
+
         public Response customerAll(MySqlConnection connection)
         {
             Response response = new Response();
             connection.Open();
             MySqlCommand cmd = new MySqlCommand("sp_customer_all", connection);
-            cmd.CommandType= CommandType.StoredProcedure;
+            cmd.CommandType = CommandType.StoredProcedure;
             MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
 
             DataTable dataTable = new DataTable();
@@ -175,7 +177,7 @@ namespace WebServiceShopping.Connections
 
                 int rowsAffected = updateCmd.ExecuteNonQuery();
                 connection.Close();
-                if(rowsAffected > 0)
+                if (rowsAffected > 0)
                 {
                     response.StatusCode = 200;
                     response.StatusMessage = "Cập nhật tài khoản thành công.";
@@ -188,7 +190,7 @@ namespace WebServiceShopping.Connections
             }
             finally
             {
-                if(connection.State == ConnectionState.Open)
+                if (connection.State == ConnectionState.Open)
                 {
                     connection.Close();
                 }
@@ -204,9 +206,9 @@ namespace WebServiceShopping.Connections
                 MySqlCommand checkPasswordCmd = new MySqlCommand("Select password_hash From customer Where id_customer = @customerID", connection);
                 checkPasswordCmd.Parameters.AddWithValue("@customerID", customerID);
                 string hashedPasswordFromDb = Convert.ToString(checkPasswordCmd.ExecuteScalar());
-                if(PasswordHelper.VerifyPassword(currentPassword, hashedPasswordFromDb))
+                if (PasswordHelper.VerifyPassword(currentPassword, hashedPasswordFromDb))
                 {
-                    if(newPassword == confirmNewPassword)
+                    if (newPassword == confirmNewPassword)
                     {
                         string newHashedPassword = PasswordHelper.HashPassword(newPassword);
                         MySqlCommand updatePasswordCmd = new MySqlCommand("Update customer SET password_hash = @NewPassword Where id_customer = @customerID", connection);
@@ -230,7 +232,8 @@ namespace WebServiceShopping.Connections
                 }
 
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 response.StatusCode = 400;
                 response.StatusMessage = ex.Message;
             }
@@ -295,5 +298,99 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
+        public async Task<int> SendPasswordResetOTP(MySqlConnection connection, string email)
+        {
+
+            connection.Open();
+            string query = "SELECT * FROM customer WHERE email = @Email";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@Email", email);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        return 1;
+                    }
+                    await reader.ReadAsync();
+                    string userEmail = reader.GetString(reader.GetOrdinal("email"));
+                    var otp = new Random().Next(100000, 999999).ToString();
+                    var otpExpiry = DateTime.Now.AddMinutes(5);
+                    SendOtpToEmailAsync(userEmail, "Your password reset OTP", $"Your OTP is: {otp}");
+                    await reader.CloseAsync();
+                    string updateQuery = "UPDATE customer SET otp = @Otp, otpExpiry = @OtpExpiry WHERE email = @Email";
+                    using (MySqlCommand updateCommand = new MySqlCommand(updateQuery, connection))
+                    {
+                        updateCommand.Parameters.AddWithValue("@Otp", otp);
+                        updateCommand.Parameters.AddWithValue("@OtpExpiry", otpExpiry);
+                        updateCommand.Parameters.AddWithValue("@Email", userEmail);
+                        await updateCommand.ExecuteNonQueryAsync();
+                    }
+
+                }
+            }
+            return 0;
+        }
+
+        public int SendOtpToEmailAsync(string toEmail, string subject, string body)
+        {
+
+            var fromAddress = new MailAddress("thanhnc279@gmail.com", "Thanhnc");
+            var toAddress = new MailAddress(toEmail, "To Name");
+            const string fromPassword = "yfagiawekhvcuism";
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            using var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            smtp.Send(message);
+            return 0;
+        }
+
+        public async Task<int> ResetPasswordAsync(MySqlConnection connection, ResetPassword model)
+        {
+            connection.Open();
+            string query = "SELECT * FROM customer WHERE email = @Email";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@Email", model.email);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        return 1;
+                    }
+                    await reader.ReadAsync();
+                    var userOtp = reader.IsDBNull(reader.GetOrdinal("otp")) ? null : reader.GetString(reader.GetOrdinal("otp"));
+                    DateTime? userOtpExpiry = reader.IsDBNull(reader.GetOrdinal("otpExpiry")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("otpExpiry"));
+                    string modelOtpAsString = model.otp.ToString();
+                    if (userOtp != modelOtpAsString || DateTime.UtcNow > userOtpExpiry)
+                    {
+                        return 2;
+                    }
+                    string updateQuery = "UPDATE customer SET otp = NULL, otpExpiry = NULL, password_hash = @newPassword WHERE email = @Email";
+                    await reader.CloseAsync();
+                    using (MySqlCommand updateCommand = new MySqlCommand(updateQuery, connection))
+                    {
+                        updateCommand.Parameters.AddWithValue("@newPassword", model.newPassword);
+                        updateCommand.Parameters.AddWithValue("@Email", model.email);
+                        await updateCommand.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            return 0;
+        }
+
     }
 }

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using WebServiceShopping.Connections;
 using WebServiceShopping.Models;
@@ -76,6 +75,33 @@ namespace WebServiceShopping.Controllers
             MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCustomer.getCustomerById(connection, CustomerID);
             return response;
+        }
+
+        [HttpPost]
+        [Route("SendPasswordResetOTP")]
+        public async Task<IActionResult> SendPasswordResetOTP(string email)
+        {
+            ConnectCustomer connectCustomer = new ConnectCustomer();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            var res = await connectCustomer.SendPasswordResetOTP(connection, email);
+            if (res != 0)
+            {
+                return BadRequest("Send otp fail");
+            }
+            return Ok("Send opt to email successfully!");
+        }
+        [HttpPost]
+        [Route("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(ResetPassword model)
+        {
+            ConnectCustomer connectCustomer = new ConnectCustomer();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            var res = await connectCustomer.ResetPasswordAsync(connection, model);
+            if (res == 2)
+            {
+                return BadRequest("Wrong Otp");
+            }
+            return Ok("Reset password successfully!");
         }
     }
 }

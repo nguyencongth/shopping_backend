@@ -43,5 +43,46 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
+        public Response getCategoryById(MySqlConnection connection, int categoryId)
+        {
+            Response response = new Response();
+            connection.Open();
+            MySqlCommand cmd = new MySqlCommand("getCategoryById", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@categoryId", categoryId);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            adapter.Fill(dt);
+            connection.Close();
+
+            List<ProductType> categories = new List<ProductType>();
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    ProductType category = new ProductType();
+                    category.idloaisp = Convert.ToInt32(dt.Rows[i]["idloaisp"]);
+                    category.tenloaisp = Convert.ToString(dt.Rows[i]["tenloaisp"]);
+
+                    categories.Add(category);
+                }
+            }
+
+            if (categories.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Thông tin danh mục sản phẩm";
+                response.arrayProductType = categories;
+            }
+            else
+            {
+                response.StatusCode = 100;
+                response.StatusMessage = "Không tìm thấy danh mục sản phẩm!";
+                response.arrayProductType = null;
+            }
+            return response;
+        }
     }
 }

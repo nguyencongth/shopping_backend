@@ -8,5 +8,7 @@
         public string phonenumber { get; set;}
         public string password { get; set;}
         public string address { get; set;}
+        public int otp { get; set; }
+        public DateTime otpExpiry { get; set; }
     }
 }

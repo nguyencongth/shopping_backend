@@ -21,7 +21,6 @@ namespace WebServiceShopping.Connections
                     OrderCmd.CommandType = CommandType.StoredProcedure;
                     OrderCmd.Parameters.AddWithValue("IN_CustomerId", orders.id_customer);
                     OrderCmd.Parameters.AddWithValue("IN_OrderDate", DateTime.Now);
-                    OrderCmd.Parameters.AddWithValue("IN_shippingAddress", orders.shippingAddress);
                     OrderCmd.Parameters.AddWithValue("IN_TotalAmount", 0);
                     OrderCmd.Parameters.AddWithValue("IN_paymentMethod", orders.paymentMethod);
                     OrderCmd.Parameters.AddWithValue("IN_orderStatus", 0);
@@ -131,7 +130,6 @@ namespace WebServiceShopping.Connections
                             order_id = orderID,
                             id_customer = reader.GetInt32("id_customer"),
                             order_date = reader.GetDateTime("order_date"),
-                            shippingAddress = reader.GetString("shippingAddress"),
                             total_amount = reader.GetDecimal("total_amount"),
                             paymentMethod = reader.GetString("paymentMethod"),
                             orderStatus = reader.GetInt32("orderStatus"),
@@ -146,7 +144,9 @@ namespace WebServiceShopping.Connections
                         order_item_id = reader.GetInt32("order_item_id"),
                         idsp = reader.GetInt32("idsp"),
                         quantity = reader.GetInt32("quantity"),
-                        subtotal = reader.GetDecimal("subtotal")
+                        subtotal = reader.GetDecimal("subtotal"),
+                        tensp = reader.GetString("tensp"),
+                        anhsp = reader.GetString("anhsp")
                     });
                 }
             }

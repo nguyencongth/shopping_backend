@@ -18,6 +18,7 @@
         public OrderItem orderItem { get; set; }
         public Login login { get; set; }
         public PaginationInfo Pagination { get; set; }
+        public SendOtpResponse sendOtpResponse { get; set; }
         public int id_customer { get; set; }
         public string Token { get; set; }
         public DateTime ExpireAt { get; set; }

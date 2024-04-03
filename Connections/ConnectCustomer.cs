@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Net.Mail;
 using System.Net;
+using Response = WebServiceShopping.Models.Response;
 
 namespace WebServiceShopping.Connections
 {
@@ -298,9 +299,9 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
-        public async Task<int> SendPasswordResetOTP(MySqlConnection connection, string email)
+        public Response SendPasswordResetOTP(MySqlConnection connection, string email)
         {
-
+            Response response = new Response();
             connection.Open();
             string query = "SELECT * FROM customer WHERE email = @Email";
             using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -310,26 +311,30 @@ namespace WebServiceShopping.Connections
                 {
                     if (!reader.HasRows)
                     {
-                        return 1;
+                        response.StatusCode = 400;
+                        response.StatusMessage = "Email không tồn tại";
                     }
-                    await reader.ReadAsync();
+                    reader.ReadAsync();
                     string userEmail = reader.GetString(reader.GetOrdinal("email"));
                     var otp = new Random().Next(100000, 999999).ToString();
                     var otpExpiry = DateTime.Now.AddMinutes(5);
                     SendOtpToEmailAsync(userEmail, "Your password reset OTP", $"Your OTP is: {otp}");
-                    await reader.CloseAsync();
+                    reader.CloseAsync();
                     string updateQuery = "UPDATE customer SET otp = @Otp, otpExpiry = @OtpExpiry WHERE email = @Email";
                     using (MySqlCommand updateCommand = new MySqlCommand(updateQuery, connection))
                     {
                         updateCommand.Parameters.AddWithValue("@Otp", otp);
                         updateCommand.Parameters.AddWithValue("@OtpExpiry", otpExpiry);
                         updateCommand.Parameters.AddWithValue("@Email", userEmail);
-                        await updateCommand.ExecuteNonQueryAsync();
+                        updateCommand.ExecuteNonQueryAsync();
                     }
 
                 }
             }
-            return 0;
+            connection.Close();
+            response.StatusCode = 200;
+            response.StatusMessage = "Gửi otp thành công";
+            return response;
         }
 
         public int SendOtpToEmailAsync(string toEmail, string subject, string body)
@@ -358,8 +363,9 @@ namespace WebServiceShopping.Connections
             return 0;
         }
 
-        public async Task<int> ResetPasswordAsync(MySqlConnection connection, ResetPassword model)
+        public Response ResetPasswordAsync(MySqlConnection connection, ResetPassword model)
         {
+            Response response = new Response();
             connection.Open();
             string query = "SELECT * FROM customer WHERE email = @Email";
             using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -369,27 +375,32 @@ namespace WebServiceShopping.Connections
                 {
                     if (!reader.HasRows)
                     {
-                        return 1;
+                        response.StatusCode = 400;
+                        response.StatusMessage = "Email không tồn tại";
                     }
-                    await reader.ReadAsync();
+                    reader.ReadAsync();
                     var userOtp = reader.IsDBNull(reader.GetOrdinal("otp")) ? null : reader.GetString(reader.GetOrdinal("otp"));
                     DateTime? userOtpExpiry = reader.IsDBNull(reader.GetOrdinal("otpExpiry")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("otpExpiry"));
                     string modelOtpAsString = model.otp.ToString();
                     if (userOtp != modelOtpAsString || DateTime.UtcNow > userOtpExpiry)
                     {
-                        return 2;
+                        response.StatusCode = 400;
+                        response.StatusMessage = "Lỗi khi xác thực OTP";
                     }
                     string updateQuery = "UPDATE customer SET otp = NULL, otpExpiry = NULL, password_hash = @newPassword WHERE email = @Email";
-                    await reader.CloseAsync();
+                    reader.CloseAsync();
                     using (MySqlCommand updateCommand = new MySqlCommand(updateQuery, connection))
                     {
-                        updateCommand.Parameters.AddWithValue("@newPassword", model.newPassword);
+                        updateCommand.Parameters.AddWithValue("@newPassword", PasswordHelper.HashPassword(model.newPassword));
                         updateCommand.Parameters.AddWithValue("@Email", model.email);
-                        await updateCommand.ExecuteNonQueryAsync();
+                        updateCommand.ExecuteNonQueryAsync();
                     }
                 }
             }
-            return 0;
+            connection.Close();
+            response.StatusCode = 200;
+            response.StatusMessage = "Đăt lại mật khẩu thành công";
+            return response;
         }
 
     }

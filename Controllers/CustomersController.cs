@@ -79,29 +79,24 @@ namespace WebServiceShopping.Controllers
 
         [HttpPost]
         [Route("SendPasswordResetOTP")]
-        public async Task<IActionResult> SendPasswordResetOTP(string email)
+        public Response SendPasswordResetOTP(string email)
         {
+            Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
             MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
-            var res = await connectCustomer.SendPasswordResetOTP(connection, email);
-            if (res != 0)
-            {
-                return BadRequest("Send otp fail");
-            }
-            return Ok("Send opt to email successfully!");
+            response = connectCustomer.SendPasswordResetOTP(connection, email);
+            return response;
         }
+        
         [HttpPost]
         [Route("ResetPassword")]
-        public async Task<IActionResult> ResetPassword(ResetPassword model)
+        public Response ResetPassword(ResetPassword model)
         {
+            Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
             MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
-            var res = await connectCustomer.ResetPasswordAsync(connection, model);
-            if (res == 2)
-            {
-                return BadRequest("Wrong Otp");
-            }
-            return Ok("Reset password successfully!");
+            response = connectCustomer.ResetPasswordAsync(connection, model);
+            return response;
         }
     }
 }

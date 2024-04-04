@@ -1,9 +1,7 @@
 ﻿
 using MySql.Data.MySqlClient;
 using System.Data;
-using System.Drawing.Printing;
 using WebServiceShopping.Models;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace WebServiceShopping.Connections
 {
@@ -115,7 +113,7 @@ namespace WebServiceShopping.Connections
             }
             else
             {
-                response.StatusCode = 100;
+                response.StatusCode = 400;
                 response.StatusMessage = "Không tìm thấy sản phẩm nào!";
                 response.arrayProduct = null;
                 response.Pagination = null;
@@ -124,6 +122,51 @@ namespace WebServiceShopping.Connections
             return response;
         }
 
+        public Response getProductNew(MySqlConnection connection)
+        {
+            Response response = new Response();
+            connection.Open();
+            string query = "SELECT * FROM sanpham ORDER BY ngaynhaphang DESC LIMIT 5";
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+            
+            adapter.Fill(dt);
+
+            List<Product> products = new List<Product>();
+            if(dt.Rows.Count > 0 )
+            {
+                for(int i = 0; i < dt.Rows.Count; i++ ) {
+                    Product product = new Product();
+                    product.idsp = Convert.ToInt32(dt.Rows[i]["idsp"]);
+                    product.idloaisp = Convert.ToInt32(dt.Rows[i]["idloaisp"]);
+                    product.tensp = Convert.ToString(dt.Rows[i]["tensp"]);
+                    product.gianhap = Convert.ToDecimal(dt.Rows[i]["gianhap"]);
+                    product.giaban = Convert.ToDecimal(dt.Rows[i]["giaban"]);
+                    product.thongtinsp = Convert.ToString(dt.Rows[i]["thongtinsp"]);
+                    product.slsanpham = Convert.ToInt32(dt.Rows[i]["slsanpham"]);
+                    product.ngaynhaphang = Convert.ToDateTime(dt.Rows[i]["ngaynhaphang"]);
+                    product.anhsp = Convert.ToString(dt.Rows[i]["anhsp"]);
+
+                    products.Add(product);
+                }
+            }
+            if (products.Count > 0 )
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Danh sách sản phẩm mới nhất";
+                response.arrayProduct = products;
+            }
+            else
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Không tìm thấy sản phẩm nào!";
+                response.arrayProduct = null;
+            }
+            connection.Close();
+            return response;
+        }
         public Response productByCategoryId(MySqlConnection connection,int categoryId, int priceRange, int page, int pageSize)
         {
             Response response = new Response();

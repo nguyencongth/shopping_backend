@@ -51,6 +51,17 @@ namespace WebServiceShopping.Controllers
         }
 
         [HttpGet]
+        [Route("productNew")]
+        public Response getProductNew()
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.getProductNew(connection);
+            return response;
+        }
+
+        [HttpGet]
         [Route("productDress")]
         public Response productDress(int page, int pageSize)
         {

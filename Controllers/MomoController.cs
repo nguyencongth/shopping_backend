@@ -9,8 +9,8 @@ namespace WebServiceShopping.Controllers;
 [ApiController]
 public class MomoController : Controller
 {
-   [HttpGet("PaymentMomo")]
-    public async Task<IActionResult> Payment()
+    [HttpGet("PaymentMomo")]
+    public async Task<IActionResult> Payment(int totalAmount, string desc)
     {
         try
         {
@@ -18,11 +18,11 @@ public class MomoController : Controller
             string partnerCode = "MOMOOJOI20210710";
             string accessKey = "iPXneGmrJH0G8FOP";
             string serectkey = "sFcbSGRSJjwGxwhhcEktCHWYUuTuPNDB";
-            string orderInfo = "tuantv test API Momo";
+            string orderInfo = desc;
             string returnUrl = "https://localhost:7249/api/Momo/ConfirmPaymentClient";
             string notifyurl = "https://4c8d-2001-ee0-5045-50-58c1-b2ec-3123-740d.ap.ngrok.io/Home/SavePayment";
 
-            string amount = "1000";
+            string amount = totalAmount.ToString();
             string orderid = DateTime.Now.Ticks.ToString();
             string requestId = DateTime.Now.Ticks.ToString();
             string extraData = "";
@@ -76,17 +76,9 @@ public class MomoController : Controller
     [HttpGet("ConfirmPaymentClient")]
     public async Task<IActionResult> ConfirmPaymentClient(Momo result)
     {
-        //lấy kết quả Momo trả về và hiển thị thông báo cho người dùng (có thể lấy dữ liệu ở đây cập nhật xuống db)
         string rMessage = result.message;
         string rOrderId = result.orderId;
-        string rErrorCode = result.errorCode; // = 0: thanh toán thành công
+        string rErrorCode = result.errorCode;
         return Ok(rMessage);
     }
-
-    /*[HttpPost]
-    public void SavePayment()
-    {
-        //cập nhật dữ liệu vào db
-        String a = "";
-    }*/
 }

@@ -21,7 +21,7 @@ namespace WebServiceShopping.Connections
 
             SqlCommand checkEmailCmd = new SqlCommand("sp_checkEmail", connection);
             checkEmailCmd.CommandType = CommandType.StoredProcedure;
-            checkEmailCmd.Parameters.AddWithValue("emailValue", customer.email);
+            checkEmailCmd.Parameters.AddWithValue("@emailValue", customer.email);
             int customerCount = Convert.ToInt32(checkEmailCmd.ExecuteScalar());
             if (customerCount > 0)
             {
@@ -36,12 +36,12 @@ namespace WebServiceShopping.Connections
 
             cmd.Parameters.AddWithValue("@full_name", customer.fullName);
 
-            cmd.Parameters.AddWithValue("@emailValue", customer.email);
+            cmd.Parameters.AddWithValue("@email", customer.email);
 
             cmd.Parameters.AddWithValue("@phone_number", customer.phonenumber);
 
             string hashedPassword = PasswordHelper.HashPassword(customer.password);
-            cmd.Parameters.AddWithValue("@password_h", hashedPassword);
+            cmd.Parameters.AddWithValue("@password_hash", hashedPassword);
 
             cmd.Parameters.AddWithValue("@address", customer.address);
 
@@ -55,7 +55,7 @@ namespace WebServiceShopping.Connections
             }
             else
             {
-                response.StatusCode = 100;
+                response.StatusCode = 400;
                 response.StatusMessage = "Đăng ký thất bại";
             }
             return response;

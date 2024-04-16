@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
+using Microsoft.Data.SqlClient;
 using WebServiceShopping.Connections;
 using WebServiceShopping.Models;
 
@@ -20,7 +20,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCustomer.register(customer, connection);
             return response;
 
@@ -31,7 +31,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCustomer.Login(login, connection);
             return response;
         }
@@ -41,7 +41,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCustomer.customerAll(connection);
             return response;
         }
@@ -52,7 +52,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCustomer.updateInfo(customer, connection);
             return response;
         }
@@ -62,7 +62,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCustomer.changePassword(customerID, currentPassword, newPassword, confirmNewPassword, connection);
             return response;
         }
@@ -72,7 +72,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCustomer.getCustomerById(connection, CustomerID);
             return response;
         }
@@ -83,7 +83,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCustomer.SendPasswordResetOTP(connection, email);
             return response;
         }
@@ -94,7 +94,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCustomer connectCustomer = new ConnectCustomer();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCustomer.ResetPasswordAsync(connection, model);
             return response;
         }

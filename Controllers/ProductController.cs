@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using WebServiceShopping.Connections;
 using WebServiceShopping.Models;
 
@@ -19,12 +18,12 @@ namespace WebServiceShopping.Controllers
 
         [HttpGet]
         [Route("getProductId")]
-        public Response getProductId(int idsp)
+        public Response getProductId(int productID)
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
-            MySqlConnection mySqlConnection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
-            response = connectProduct.getProductId(mySqlConnection, idsp);
+            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.getProductId(sqlConnection, productID);
             return response;
         }
 
@@ -34,7 +33,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectProduct.productByCategoryId(connection,categoryId, priceRange, page, pageSize);
             return response;
         }
@@ -45,7 +44,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectProduct.productAll(connection, priceRange, page, pageSize);
             return response;
         }
@@ -56,7 +55,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectProduct.getProductNew(connection);
             return response;
         }
@@ -67,7 +66,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectProduct.product_dress(connection, page, pageSize);
             return response;
         }
@@ -78,7 +77,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectProduct.product_shirt(connection, page, pageSize);
             return response;
         }
@@ -89,7 +88,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectProduct.SearchProduct(connection, keyword, page, pageSize);
             return response;
         }
@@ -99,7 +98,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectProduct.FilterProductsByPrice(connection, priceRange, page, pageSize);
             return response;
         }

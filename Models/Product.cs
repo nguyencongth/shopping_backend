@@ -4,14 +4,14 @@ namespace WebServiceShopping.Models
 {
     public class Product
     {
-        public int idsp { get; set; }
-        public int idloaisp { get; set; }
-        public string tensp { get; set; }
-        public Decimal gianhap { get; set; }
-        public Decimal giaban { get; set; }
-        public string thongtinsp { get; set; }
-        public int slsanpham { get; set; }
-        public DateTime ngaynhaphang { get; set; }
-        public string anhsp { get; set; }
+        public int productId { get; set; }
+        public int categoryId { get; set; }
+        public string productName { get; set; }
+        public Decimal entryPrice { get; set; }
+        public Decimal price { get; set; }
+        public string descProduct { get; set; }
+        public int quantityStock { get; set; }
+        public DateTime dateAdded { get; set; }
+        public string imageProduct { get; set; }
     }
 }

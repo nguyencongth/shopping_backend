@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using WebServiceShopping.Connections;
 using WebServiceShopping.Models;
 
@@ -23,19 +22,19 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCart connectCart = new ConnectCart();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCart.AddToCart(cart, connection);
             return response;
         }
 
         [HttpPatch]
         [Route("updateCartQuantity")]
-        public Response UpdateCartQuantity(int id_customer, int idsp, int newQuantity)
+        public Response UpdateCartQuantity(int customerID, int productID, int newQuantity)
         {
             Response response = new Response();
             ConnectCart connectCart = new ConnectCart();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
-            response = connectCart.UpdateCartQuantity(connection, id_customer, idsp, newQuantity);
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectCart.UpdateCartQuantity(connection, customerID, productID, newQuantity);
             return response;
         }
 
@@ -45,7 +44,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCart connectCart = new ConnectCart();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCart.deleteCart(connection, customerID);
             return response;
         }
@@ -56,7 +55,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCart connectCart = new ConnectCart();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCart.deleteCartItem(connection, customerID, productID);
             return response;
         }
@@ -67,7 +66,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectCart connectCart = new ConnectCart();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectCart.GetCartItemsByCustomerId(customerID, connection);
             return response;
         }

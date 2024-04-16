@@ -42,7 +42,7 @@ namespace WebServiceShopping.Connections
                         Product product = GetProductInfo(connection, orderItem.idsp);
                         if (product != null)
                         {
-                            decimal subtotal = product.giaban * orderItem.quantity;
+                            decimal subtotal = product.price * orderItem.quantity;
                             orderItemCmd.Parameters.AddWithValue("IN_subtotal", subtotal);
                             orderItem.subtotal = subtotal;
                         }
@@ -206,8 +206,8 @@ namespace WebServiceShopping.Connections
                 {
                     product = new Product
                     {
-                        idsp = reader.GetInt32("idsp"),
-                        giaban = reader.GetDecimal("giaban"),
+                        productId = reader.GetInt32("productId"),
+                        price = reader.GetDecimal("price"),
                     };
                 }
             }

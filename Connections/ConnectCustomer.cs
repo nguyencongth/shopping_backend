@@ -1,6 +1,4 @@
-﻿
-using System.Data;
-using MySql.Data.MySqlClient;
+﻿using System.Data;
 using WebServiceShopping.Models;
 using WebServiceShopping.Hash;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,18 +7,19 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Net.Mail;
 using System.Net;
+using Microsoft.Data.SqlClient;
 using Response = WebServiceShopping.Models.Response;
 
 namespace WebServiceShopping.Connections
 {
     public class ConnectCustomer
     {
-        public Response register(Customers customer, MySqlConnection connection)
+        public Response register(Customers customer, SqlConnection connection)
         {
             Response response = new Response();
             connection.Open();
 
-            MySqlCommand checkEmailCmd = new MySqlCommand("sp_checkEmail", connection);
+            SqlCommand checkEmailCmd = new SqlCommand("sp_checkEmail", connection);
             checkEmailCmd.CommandType = CommandType.StoredProcedure;
             checkEmailCmd.Parameters.AddWithValue("emailValue", customer.email);
             int customerCount = Convert.ToInt32(checkEmailCmd.ExecuteScalar());
@@ -32,19 +31,19 @@ namespace WebServiceShopping.Connections
                 return response;
             }
 
-            MySqlCommand cmd = new MySqlCommand("sp_register_customer", connection);
+            SqlCommand cmd = new SqlCommand("sp_register_customer", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
-            cmd.Parameters.AddWithValue("full_name", customer.fullname);
+            cmd.Parameters.AddWithValue("@full_name", customer.fullName);
 
-            cmd.Parameters.AddWithValue("emailValue", customer.email);
+            cmd.Parameters.AddWithValue("@emailValue", customer.email);
 
-            cmd.Parameters.AddWithValue("phone_number", customer.phonenumber);
+            cmd.Parameters.AddWithValue("@phone_number", customer.phonenumber);
 
             string hashedPassword = PasswordHelper.HashPassword(customer.password);
-            cmd.Parameters.AddWithValue("password_h", hashedPassword);
+            cmd.Parameters.AddWithValue("@password_h", hashedPassword);
 
-            cmd.Parameters.AddWithValue("address", customer.address);
+            cmd.Parameters.AddWithValue("@address", customer.address);
 
 
             int i = cmd.ExecuteNonQuery();
@@ -64,20 +63,20 @@ namespace WebServiceShopping.Connections
 
         }
 
-        public Response Login(Login login, MySqlConnection connection)
+        public Response Login(Login login, SqlConnection connection)
         {
             Response response = new Response();
             connection.Open();
 
-            MySqlCommand checkEmailCmd = new MySqlCommand("SELECT id_customer, password_hash FROM customer WHERE email = @Email", connection);
+            SqlCommand checkEmailCmd = new SqlCommand("SELECT customerId, password_hash FROM customers WHERE email = @Email", connection);
             checkEmailCmd.Parameters.AddWithValue("@Email", login.email);
 
-            using (MySqlDataReader reader = checkEmailCmd.ExecuteReader())
+            using (SqlDataReader reader = checkEmailCmd.ExecuteReader())
             {
                 if (reader.Read())
                 {
                     string hashedPasswordFromDb = reader.GetString("password_hash");
-                    int idCustomer = reader.GetInt32("id_customer");
+                    int idCustomer = reader.GetInt32("customerId");
 
                     if (PasswordHelper.VerifyPassword(login.password, hashedPasswordFromDb))
                     {
@@ -122,13 +121,13 @@ namespace WebServiceShopping.Connections
             return response;
         }
 
-        public Response customerAll(MySqlConnection connection)
+        public Response customerAll(SqlConnection connection)
         {
             Response response = new Response();
             connection.Open();
-            MySqlCommand cmd = new MySqlCommand("sp_customer_all", connection);
+            SqlCommand cmd = new SqlCommand("sp_customer_all", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
 
             DataTable dataTable = new DataTable();
             adapter.Fill(dataTable);
@@ -139,8 +138,8 @@ namespace WebServiceShopping.Connections
                 for (int i = 0; i < dataTable.Rows.Count; i++)
                 {
                     Customers customer = new Customers();
-                    customer.id_customer = Convert.ToInt32(dataTable.Rows[i]["id_customer"]);
-                    customer.fullname = Convert.ToString(dataTable.Rows[i]["fullname"]);
+                    customer.customerId = Convert.ToInt32(dataTable.Rows[i]["customerId"]);
+                    customer.fullName = Convert.ToString(dataTable.Rows[i]["fullName"]);
                     customer.email = Convert.ToString(dataTable.Rows[i]["email"]);
                     customer.phonenumber = Convert.ToString(dataTable.Rows[i]["phonenumber"]);
                     customer.password = Convert.ToString(dataTable.Rows[i]["password_hash"]);
@@ -162,19 +161,19 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
-        public Response updateInfo(Customers customer, MySqlConnection connection)
+        public Response updateInfo(Customers customer, SqlConnection connection)
         {
             Response response = new Response();
             try
             {
                 connection.Open();
-                MySqlCommand updateCmd = new MySqlCommand("sp_update_info", connection);
+                SqlCommand updateCmd = new SqlCommand("sp_update_info", connection);
                 updateCmd.CommandType = CommandType.StoredProcedure;
-                updateCmd.Parameters.AddWithValue("IN_FullName", customer.fullname);
-                updateCmd.Parameters.AddWithValue("IN_Email", customer.email);
-                updateCmd.Parameters.AddWithValue("IN_PhoneNumber", customer.phonenumber);
-                updateCmd.Parameters.AddWithValue("IN_Address", customer.address);
-                updateCmd.Parameters.AddWithValue("IN_CustomerID", customer.id_customer);
+                updateCmd.Parameters.AddWithValue("@FullName", customer.fullName);
+                updateCmd.Parameters.AddWithValue("@Email", customer.email);
+                updateCmd.Parameters.AddWithValue("@PhoneNumber", customer.phonenumber);
+                updateCmd.Parameters.AddWithValue("@Address", customer.address);
+                updateCmd.Parameters.AddWithValue("@CustomerID", customer.customerId);
 
                 int rowsAffected = updateCmd.ExecuteNonQuery();
                 connection.Close();
@@ -198,13 +197,13 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
-        public Response changePassword(int customerID, string currentPassword, string newPassword, string confirmNewPassword, MySqlConnection connection)
+        public Response changePassword(int customerID, string currentPassword, string newPassword, string confirmNewPassword, SqlConnection connection)
         {
             Response response = new Response();
             try
             {
                 connection.Open();
-                MySqlCommand checkPasswordCmd = new MySqlCommand("Select password_hash From customer Where id_customer = @customerID", connection);
+                SqlCommand checkPasswordCmd = new SqlCommand("Select password_hash From customers Where customerId = @customerID", connection);
                 checkPasswordCmd.Parameters.AddWithValue("@customerID", customerID);
                 string hashedPasswordFromDb = Convert.ToString(checkPasswordCmd.ExecuteScalar());
                 if (PasswordHelper.VerifyPassword(currentPassword, hashedPasswordFromDb))
@@ -212,7 +211,7 @@ namespace WebServiceShopping.Connections
                     if (newPassword == confirmNewPassword)
                     {
                         string newHashedPassword = PasswordHelper.HashPassword(newPassword);
-                        MySqlCommand updatePasswordCmd = new MySqlCommand("Update customer SET password_hash = @NewPassword Where id_customer = @customerID", connection);
+                        SqlCommand updatePasswordCmd = new SqlCommand("Update customers SET password_hash = @NewPassword Where customerId = @customerID", connection);
                         updatePasswordCmd.Parameters.AddWithValue("@NewPassword", newHashedPassword);
                         updatePasswordCmd.Parameters.AddWithValue("@customerID", customerID);
                         updatePasswordCmd.ExecuteNonQuery();
@@ -248,17 +247,17 @@ namespace WebServiceShopping.Connections
             connection.Close();
             return response;
         }
-        public Response getCustomerById(MySqlConnection connection, int CustomerID)
+        public Response getCustomerById(SqlConnection connection, int CustomerID)
         {
             Response response = new Response();
             try
             {
                 connection.Open();
-                MySqlCommand getCustomerById = new MySqlCommand("getCustomerById", connection);
+                SqlCommand getCustomerById = new SqlCommand("getCustomerById", connection);
                 getCustomerById.CommandType = CommandType.StoredProcedure;
                 getCustomerById.Parameters.AddWithValue("IN_CustomerID", CustomerID);
 
-                MySqlDataAdapter adapter = new MySqlDataAdapter(getCustomerById);
+                SqlDataAdapter adapter = new SqlDataAdapter(getCustomerById);
 
                 DataTable dataTable = new DataTable();
 
@@ -272,8 +271,8 @@ namespace WebServiceShopping.Connections
                     for (int i = 0; i < dataTable.Rows.Count; i++)
                     {
                         Customers customer = new Customers();
-                        customer.id_customer = Convert.ToInt32(dataTable.Rows[i]["id_customer"]);
-                        customer.fullname = Convert.ToString(dataTable.Rows[i]["fullname"]);
+                        customer.customerId = Convert.ToInt32(dataTable.Rows[i]["customerId"]);
+                        customer.fullName = Convert.ToString(dataTable.Rows[i]["fullName"]);
                         customer.email = Convert.ToString(dataTable.Rows[i]["email"]);
                         customer.phonenumber = Convert.ToString(dataTable.Rows[i]["phonenumber"]);
                         customer.password = Convert.ToString(dataTable.Rows[i]["password_hash"]);
@@ -299,15 +298,15 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
-        public Response SendPasswordResetOTP(MySqlConnection connection, string email)
+        public Response SendPasswordResetOTP(SqlConnection connection, string email)
         {
             Response response = new Response();
             connection.Open();
-            string query = "SELECT * FROM customer WHERE email = @Email";
-            using (MySqlCommand command = new MySqlCommand(query, connection))
+            string query = "SELECT * FROM customers WHERE email = @Email";
+            using (SqlCommand command = new SqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@Email", email);
-                using (MySqlDataReader reader = command.ExecuteReader())
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
                     if (!reader.HasRows)
                     {
@@ -320,8 +319,8 @@ namespace WebServiceShopping.Connections
                     var otpExpiry = DateTime.Now.AddMinutes(5);
                     SendOtpToEmailAsync(userEmail, "Your password reset OTP", $"Your OTP is: {otp}");
                     reader.CloseAsync();
-                    string updateQuery = "UPDATE customer SET otp = @Otp, otpExpiry = @OtpExpiry WHERE email = @Email";
-                    using (MySqlCommand updateCommand = new MySqlCommand(updateQuery, connection))
+                    string updateQuery = "UPDATE customers SET otp = @Otp, otpExpiry = @OtpExpiry WHERE email = @Email";
+                    using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
                     {
                         updateCommand.Parameters.AddWithValue("@Otp", otp);
                         updateCommand.Parameters.AddWithValue("@OtpExpiry", otpExpiry);
@@ -363,15 +362,15 @@ namespace WebServiceShopping.Connections
             return 0;
         }
 
-        public Response ResetPasswordAsync(MySqlConnection connection, ResetPassword model)
+        public Response ResetPasswordAsync(SqlConnection connection, ResetPassword model)
         {
             Response response = new Response();
             connection.Open();
             string query = "SELECT * FROM customer WHERE email = @Email";
-            using (MySqlCommand command = new MySqlCommand(query, connection))
+            using (SqlCommand command = new SqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@Email", model.email);
-                using (MySqlDataReader reader = command.ExecuteReader())
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
                     if (!reader.HasRows)
                     {
@@ -387,9 +386,9 @@ namespace WebServiceShopping.Connections
                         response.StatusCode = 400;
                         response.StatusMessage = "Lỗi khi xác thực OTP";
                     }
-                    string updateQuery = "UPDATE customer SET otp = NULL, otpExpiry = NULL, password_hash = @newPassword WHERE email = @Email";
+                    string updateQuery = "UPDATE customers SET otp = NULL, otpExpiry = NULL, password_hash = @newPassword WHERE email = @Email";
                     reader.CloseAsync();
-                    using (MySqlCommand updateCommand = new MySqlCommand(updateQuery, connection))
+                    using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
                     {
                         updateCommand.Parameters.AddWithValue("@newPassword", PasswordHelper.HashPassword(model.newPassword));
                         updateCommand.Parameters.AddWithValue("@Email", model.email);

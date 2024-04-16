@@ -2,7 +2,7 @@
 {
     public class ProductType
     {
-        public int idloaisp { get; set; }
-        public string tenloaisp { get; set; }
+        public int categoryId { get; set; }
+        public string categoryName { get; set; }
     }
 }

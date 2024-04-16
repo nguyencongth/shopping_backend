@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.SqlClient;
-using MySql.Data.MySqlClient;
 using System.Data;
 using WebServiceShopping.Models;
 
@@ -7,25 +6,24 @@ namespace WebServiceShopping.Connections
 {
     public class ConnectCart
     {
-        public Response AddToCart(Cart cart, MySqlConnection connection)
+        public Response AddToCart(Cart cart, SqlConnection connection)
         {
             Response response = new Response();
             connection.Open();
-            MySqlCommand checkCartCmd = new MySqlCommand("SELECT COUNT(*) FROM cart WHERE id_customer = @customerID AND idsp = @productID", connection);
-            checkCartCmd.Parameters.AddWithValue("@customerID", cart.id_customer);
-            checkCartCmd.Parameters.AddWithValue("@productID", cart.idsp);
-
-            int cartCount = Convert.ToInt32(checkCartCmd.ExecuteScalar());
+            SqlCommand checkCartCmd = new SqlCommand("SELECT COUNT(*) FROM cart WHERE customerId = @customerID AND productId = @productID", connection);
+            checkCartCmd.Parameters.AddWithValue("@customerID", cart.customerId);
+            checkCartCmd.Parameters.AddWithValue("@productID", cart.productId);
+            int cartCount = (int)checkCartCmd.ExecuteScalar();
 
             if(cartCount > 0 )
             {
-                MySqlCommand updateCmd = new MySqlCommand("UPDATE cart SET quantity = quantity + @newQuantity WHERE id_customer = @customerID and idsp = @productID", connection);
+                SqlCommand updateCmd = new SqlCommand("UPDATE cart SET quantity = quantity + @newQuantity WHERE customerId = @customerID AND productId = @productID", connection);
                 updateCmd.Parameters.AddWithValue("@newQuantity", cart.quantity);
-                updateCmd.Parameters.AddWithValue("@customerID", cart.id_customer);
-                updateCmd.Parameters.AddWithValue("@productID", cart.idsp);
-                int rowsUPdated = updateCmd.ExecuteNonQuery();
+                updateCmd.Parameters.AddWithValue("@customerID", cart.customerId);
+                updateCmd.Parameters.AddWithValue("@productID", cart.productId);
+                int rowsUpdated = updateCmd.ExecuteNonQuery();
 
-                if(rowsUPdated > 0 )
+                if(rowsUpdated > 0 )
                 {
                     response.StatusCode = 200;
                     response.StatusMessage = "Cập nhật số lượng sản phẩm trong giỏ hàng thành công";
@@ -38,12 +36,12 @@ namespace WebServiceShopping.Connections
             }
             else
             {
-                MySqlCommand command = new MySqlCommand("sp_add_cart", connection);
+                SqlCommand command = new SqlCommand("sp_add_cart", connection);
                 command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("IN_id_customer", cart.id_customer);
-                command.Parameters.AddWithValue("IN_idsp", cart.idsp);
-                command.Parameters.AddWithValue("IN_quantity", cart.quantity);
-                command.Parameters.AddWithValue("IN_dateAdded", DateTime.Now);
+                command.Parameters.AddWithValue("@customerID", cart.customerId);
+                command.Parameters.AddWithValue("@productID", cart.productId);
+                command.Parameters.AddWithValue("@quantity", cart.quantity);
+                //command.Parameters.AddWithValue("@IN_dateAdded", DateTime.Now);
 
                 int i = command.ExecuteNonQuery();
 
@@ -61,12 +59,12 @@ namespace WebServiceShopping.Connections
             connection.Close();
             return response;
         }
-        public Response UpdateCartQuantity(MySqlConnection connection,int id_customer, int idsp, int newQuantity)
+        public Response UpdateCartQuantity(SqlConnection connection,int customerID, int productID, int newQuantity)
         {
             Response response = new Response();
-            MySqlCommand checkCartCmd = new MySqlCommand("SELECT COUNT(*) FROM cart WHERE id_customer = @customerID AND idsp = @productID", connection);
-            checkCartCmd.Parameters.AddWithValue("@customerID", id_customer);
-            checkCartCmd.Parameters.AddWithValue("@productID", idsp);
+            SqlCommand checkCartCmd = new SqlCommand("SELECT COUNT(*) FROM cart WHERE customerId = @customerID AND productId = @productID", connection);
+            checkCartCmd.Parameters.AddWithValue("@customerID", customerID);
+            checkCartCmd.Parameters.AddWithValue("@productID", productID);
 
             connection.Open();
 
@@ -74,10 +72,10 @@ namespace WebServiceShopping.Connections
 
             if (cartCount > 0)
             {
-                MySqlCommand updateCmd = new MySqlCommand("UPDATE Cart SET quantity = @newQuantity WHERE id_customer = @customerID AND idsp = @productID", connection);
+                SqlCommand updateCmd = new SqlCommand("UPDATE cart SET quantity = @newQuantity WHERE customerId = @customerID AND productId = @productID", connection);
                 updateCmd.Parameters.AddWithValue("@newQuantity", newQuantity);
-                updateCmd.Parameters.AddWithValue("@customerID", id_customer);
-                updateCmd.Parameters.AddWithValue("@productID", idsp);
+                updateCmd.Parameters.AddWithValue("@customerID", customerID);
+                updateCmd.Parameters.AddWithValue("@productID", productID);
                 int rowsUpdated = updateCmd.ExecuteNonQuery();
 
                 if (rowsUpdated > 0)
@@ -100,10 +98,10 @@ namespace WebServiceShopping.Connections
             connection.Close();
             return response;
         }
-        public Response deleteCart(MySqlConnection connection, int customerID)
+        public Response deleteCart(SqlConnection connection, int customerID)
         {
             Response response = new Response();
-            MySqlCommand removeCmd = new MySqlCommand("DELETE FROM cart WHERE id_customer = @customerId", connection);
+            SqlCommand removeCmd = new SqlCommand("DELETE FROM cart WHERE customerId = @customerId", connection);
             removeCmd.Parameters.AddWithValue("@customerId", customerID);
 
             connection.Open();
@@ -124,11 +122,11 @@ namespace WebServiceShopping.Connections
             return response;
         }
 
-        public Response deleteCartItem(MySqlConnection connection, int customerID, int productID)
+        public Response deleteCartItem(SqlConnection connection, int customerID, int productID)
         {
             Response response = new Response();
             connection.Open();
-            MySqlCommand removeCmd = new MySqlCommand("DELETE FROM cart WHERE id_customer = @customerId AND idsp = @productId", connection);
+            SqlCommand removeCmd = new SqlCommand("DELETE FROM cart WHERE customerId = @customerId AND productId = @productId", connection);
             removeCmd.Parameters.AddWithValue("@customerId", customerID);
             removeCmd.Parameters.AddWithValue("@productID", productID);
 
@@ -148,17 +146,17 @@ namespace WebServiceShopping.Connections
             return response;
         }
 
-        public Response GetCartItemsByCustomerId(int customerId, MySqlConnection connection)
+        public Response GetCartItemsByCustomerId(int customerId, SqlConnection connection)
         {
             Response response = new Response();
             connection.Open();
-            MySqlCommand getCartItemCmd = new MySqlCommand(
-                "SELECT cart.cartID, cart.id_customer, cart.idsp, cart.quantity, cart.dateAdded, sanpham.anhsp, sanpham.tensp, sanpham.giaban " +
+            SqlCommand getCartItemCmd = new SqlCommand(
+                "SELECT cart.cartId, cart.customerId, cart.productId, cart.quantity, cart.dateAdded, products.imageProduct, products.productName, products.price " +
                 "FROM cart " +
-                "INNER JOIN sanpham ON cart.idsp = sanpham.idsp " +
-                "WHERE cart.id_customer = @customerId", connection);
+                "INNER JOIN products ON cart.productId = products.productId " +
+                "WHERE cart.customerId = @customerId", connection);
             getCartItemCmd.Parameters.AddWithValue("@customerId", customerId);
-            MySqlDataAdapter adapter = new MySqlDataAdapter(getCartItemCmd);
+            SqlDataAdapter adapter = new SqlDataAdapter(getCartItemCmd);
 
             DataTable dataTable = new DataTable();
             
@@ -172,12 +170,12 @@ namespace WebServiceShopping.Connections
                 for (int i = 0; i < dataTable.Rows.Count; i++)
                 {
                     Cart cart = new Cart();
-                    cart.cartID = Convert.ToInt32(dataTable.Rows[i]["cartID"]);
-                    cart.id_customer = Convert.ToInt32(dataTable.Rows[i]["id_customer"]);
-                    cart.idsp = Convert.ToInt32(dataTable.Rows[i]["idsp"]);
-                    cart.tensp = Convert.ToString(dataTable.Rows[i]["tensp"]);
-                    cart.anhsp = Convert.ToString(dataTable.Rows[i]["anhsp"]);
-                    cart.giaban = Convert.ToDecimal(dataTable.Rows[i]["giaban"]);
+                    cart.cartId = Convert.ToInt32(dataTable.Rows[i]["cartId"]);
+                    cart.customerId = Convert.ToInt32(dataTable.Rows[i]["customerId"]);
+                    cart.productId = Convert.ToInt32(dataTable.Rows[i]["productId"]);
+                    cart.productName = Convert.ToString(dataTable.Rows[i]["productName"]);
+                    cart.imageProduct = Convert.ToString(dataTable.Rows[i]["imageProduct"]);
+                    cart.price = Convert.ToDecimal(dataTable.Rows[i]["price"]);
                     cart.quantity = Convert.ToInt32(dataTable.Rows[i]["quantity"]);
                     arrayCart.Add(cart);
                 }

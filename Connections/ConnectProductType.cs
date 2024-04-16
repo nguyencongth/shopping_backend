@@ -1,18 +1,18 @@
-﻿using MySql.Data.MySqlClient;
-using System.Data;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 using WebServiceShopping.Models;
 
 namespace WebServiceShopping.Connections
 {
     public class ConnectProductType
     {
-        public Response productTpyeAll(MySqlConnection connection)
+        public Response productTpyeAll(SqlConnection connection)
         {
             Response response = new Response();
             connection.Open();
-            MySqlCommand sql = new MySqlCommand("sp_loaisp_all", connection);
+            SqlCommand sql = new SqlCommand("sp_loaisp_all", connection);
             sql.CommandType = CommandType.StoredProcedure;
-            MySqlDataAdapter adapter = new MySqlDataAdapter(sql);
+            SqlDataAdapter adapter = new SqlDataAdapter(sql);
 
             DataTable dataTable = new DataTable();
             
@@ -24,8 +24,8 @@ namespace WebServiceShopping.Connections
                 for (int i = 0; i < dataTable.Rows.Count; i++)
                 {
                     ProductType type = new ProductType();
-                    type.idloaisp = Convert.ToInt32(dataTable.Rows[i]["idloaisp"]);
-                    type.tenloaisp = Convert.ToString(dataTable.Rows[i]["tenloaisp"]);
+                    type.categoryId = Convert.ToInt32(dataTable.Rows[i]["categoryId"]);
+                    type.categoryName = Convert.ToString(dataTable.Rows[i]["categoryName"]);
                     arrayProductType.Add(type);
                 }
             }
@@ -43,14 +43,14 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
-        public Response getCategoryById(MySqlConnection connection, int categoryId)
+        public Response getCategoryById(SqlConnection connection, int categoryId)
         {
             Response response = new Response();
             connection.Open();
-            MySqlCommand cmd = new MySqlCommand("getCategoryById", connection);
+            SqlCommand cmd = new SqlCommand("getCategoryById", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@categoryId", categoryId);
-            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
 
             DataTable dt = new DataTable();
 
@@ -63,8 +63,8 @@ namespace WebServiceShopping.Connections
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
                     ProductType category = new ProductType();
-                    category.idloaisp = Convert.ToInt32(dt.Rows[i]["idloaisp"]);
-                    category.tenloaisp = Convert.ToString(dt.Rows[i]["tenloaisp"]);
+                    category.categoryId = Convert.ToInt32(dt.Rows[i]["categoryId"]);
+                    category.categoryName = Convert.ToString(dt.Rows[i]["categoryName"]);
 
                     categories.Add(category);
                 }

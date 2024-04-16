@@ -2,8 +2,8 @@
 {
     public class Customers
     {
-        public int id_customer { get; set; }
-        public string fullname { get; set;}
+        public int customerId { get; set; }
+        public string fullName { get; set;}
         public string email { get; set;}
         public string phonenumber { get; set;}
         public string password { get; set;}

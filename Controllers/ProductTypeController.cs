@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using WebServiceShopping.Connections;
 using WebServiceShopping.Models;
 
@@ -23,7 +22,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectProductType connectProductType = new ConnectProductType();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice").ToString());
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice").ToString());
             response = connectProductType.productTpyeAll(connection);
             return response;
         }
@@ -34,7 +33,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectProductType connectProductType = new ConnectProductType();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice").ToString());
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice").ToString());
             response = connectProductType.getCategoryById(connection, categoryId);
             return response;
         }

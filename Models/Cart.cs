@@ -2,13 +2,13 @@
 {
     public class Cart
     {
-        public int cartID { get; set; }
-        public int id_customer { get; set; }
-        public int idsp { get; set; }
-        public int idloaisp { get; set; }
-        public string anhsp { get; set; }
-        public string tensp { get; set; }
-        public Decimal giaban { get; set; }
+        public int cartId { get; set; }
+        public int customerId { get; set; }
+        public int productId { get; set; }
+        public int categoryId { get; set; }
+        public string imageProduct { get; set; }
+        public string productName { get; set; }
+        public Decimal price { get; set; }
         public int quantity { get; set; }
         public DateTime dateAdded { get; set; }
 

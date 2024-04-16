@@ -2,10 +2,10 @@
 {
     public class Orders
     {
-        public int order_id { get; set; }
-        public int id_customer { get; set; }
-        public DateTime order_date { get; set; }
-        public Decimal total_amount { get; set; }
+        public int orderId { get; set; }
+        public int customerId { get; set; }
+        public DateTime orderDate { get; set; }
+        public Decimal totalAmount { get; set; }
         public string paymentMethod { get; set; }
         public int orderStatus { get; set; }
         public List<OrderItem> orderItems { get; set; }

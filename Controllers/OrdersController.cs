@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using WebServiceShopping.Connections;
 using WebServiceShopping.Models;
 
@@ -23,7 +22,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectOrder connectOrder = new ConnectOrder();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectOrder.CreateOrder(connection, order);
             return response;
         }
@@ -34,7 +33,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectOrder connectOrder = new ConnectOrder();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectOrder.getOrderByIdCustomer(connection, customerID);
             return response;
         }
@@ -44,7 +43,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectOrder connectOrder = new ConnectOrder();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectOrder.deleteOrder(connection, orderID);
             return response;
         }
@@ -55,7 +54,7 @@ namespace WebServiceShopping.Controllers
         {
             Response response = new Response();
             ConnectOrder connectOrder = new ConnectOrder();
-            MySqlConnection connection = new MySqlConnection(_configuration.GetConnectionString("webservice"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
             response = connectOrder.updateOrderStatus(connection, orderId, newOrderStatus);
             return response;
         }

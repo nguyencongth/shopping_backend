@@ -366,7 +366,7 @@ namespace WebServiceShopping.Connections
         {
             Response response = new Response();
             connection.Open();
-            string query = "SELECT * FROM customer WHERE email = @Email";
+            string query = "SELECT * FROM customers WHERE email = @Email";
             using (SqlCommand command = new SqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@Email", model.email);

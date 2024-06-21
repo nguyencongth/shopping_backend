@@ -135,5 +135,16 @@ namespace WebServiceShopping.Controllers
             response = connectProduct.updateInfoProduct(products, connection);
             return response;
         }
+        
+        [HttpPost]
+        [Route("addNewProduct")]
+        public Response addNewProduct(Product products)
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.addNewProduct(products, connection);
+            return response;
+        }
     }
 }

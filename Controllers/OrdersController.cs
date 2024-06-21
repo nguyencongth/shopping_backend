@@ -58,5 +58,16 @@ namespace WebServiceShopping.Controllers
             response = connectOrder.updateOrderStatus(connection, orderId, newOrderStatus);
             return response;
         }
+        
+        [HttpGet]
+        [Route("getAllOrder")]
+        public Response getAllOrder()
+        {
+            Response response = new Response();
+            ConnectOrder connectOrder = new ConnectOrder();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectOrder.getAllOrder(connection);
+            return response;
+        }
     }
 }

@@ -208,5 +208,63 @@ namespace WebServiceShopping.Connections
                 return product;
             }
         }
+
+        public Response getAllOrder(SqlConnection connection)
+        {
+            Response response = new Response();
+            connection.Open();
+            List<Orders> orders = new List<Orders>();
+            SqlCommand getOrderCmd = new SqlCommand("sp_get_all_order", connection);
+            getOrderCmd.CommandType = CommandType.StoredProcedure;
+            using (SqlDataReader reader = getOrderCmd.ExecuteReader())
+            {
+                Orders currentOrder = null;
+
+                while (reader.Read())
+                {
+                    int orderID = reader.GetInt32("orderId");
+
+                    if (currentOrder == null || currentOrder.orderId != orderID)
+                    {
+                        currentOrder = new Orders
+                        {
+                            orderId = orderID,
+                            customerId = reader.GetInt32("customerId"),
+                            orderDate = reader.GetDateTime("orderDate"),
+                            totalAmount = reader.GetDecimal("totalAmount"),
+                            paymentMethod = reader.GetString("paymentMethod"),
+                            orderStatus = reader.GetInt32("orderStatus"),
+                            orderItems = new List<OrderItem>()
+                        };
+
+                        orders.Add(currentOrder);
+                    }
+
+                    currentOrder.orderItems.Add(new OrderItem
+                    {
+                        orderItemId = reader.GetInt32("orderItemId"),
+                        productId = reader.GetInt32("productId"),
+                        quantity = reader.GetInt32("quantity"),
+                        subtotal = reader.GetDecimal("subtotal"),
+                        productName = reader.GetString("productName"),
+                        imageProduct = reader.GetString("imageProduct")
+                    });
+                }
+            }
+            if (orders.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Danh sách đơn hàng";
+                response.arrayOrders = orders;
+            }
+            else
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Không tìm thấy đơn hàng";
+            }
+            connection.Close();
+            return response;
+
+        }
     }
 }

@@ -113,5 +113,27 @@ namespace WebServiceShopping.Controllers
             response = connectProduct.getProductAdmin(connection);
             return response;
         }
+
+        [HttpDelete]
+        [Route("deleteProduct")]
+        public Response deleteProduct(int productId)
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.deleteProduct(connection, productId);
+            return response;
+        }
+        
+        [HttpPatch]
+        [Route("updateInfoProduct")]
+        public Response updateInfoProduct(Product products)
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.updateInfoProduct(products, connection);
+            return response;
+        }
     }
 }

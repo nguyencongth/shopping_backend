@@ -566,5 +566,91 @@ namespace WebServiceShopping.Connections
             connection.Close();
             return response;
         }
+        public Response deleteProduct(SqlConnection connection, int productId)
+        {
+            Response response = new Response();
+            connection.Open();
+            SqlCommand cmd = new SqlCommand("sp_del_product", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@productId", productId);
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            adapter.Fill(dt);
+            connection.Close();
+
+            List<Product> products = new List<Product>();
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    Product product = new Product();
+                    product.productId = Convert.ToInt32(dt.Rows[i]["productId"]);
+                    product.categoryId = Convert.ToInt32(dt.Rows[i]["categoryId"]);
+                    product.productName = Convert.ToString(dt.Rows[i]["productName"]);
+                    product.entryPrice = Convert.ToDecimal(dt.Rows[i]["entryPrice"]);
+                    product.price = Convert.ToDecimal(dt.Rows[i]["price"]);
+                    product.descProduct = Convert.ToString(dt.Rows[i]["descProduct"]);
+                    product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
+                    product.quantitySold = Convert.ToInt32(dt.Rows[i]["quantitySold"]);
+                    product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
+                    product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+
+                    products.Add(product);
+                }
+            }
+
+            if (products.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Xóa sản phẩm thành công";
+                response.arrayProduct = products;
+            }
+            else
+            {
+                response.StatusCode = 100;
+                response.StatusMessage = "Không tìm thấy sản phẩm nào!";
+                response.arrayProduct = null;
+            }
+
+            return response;
+        }
+
+        public Response updateInfoProduct(Product product, SqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("sp_update_product", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@productId", product.productId);
+                cmd.Parameters.AddWithValue("@categoryId", product.categoryId);
+                cmd.Parameters.AddWithValue("@productName", product.productName);
+                cmd.Parameters.AddWithValue("@entryPrice", product.entryPrice);
+                cmd.Parameters.AddWithValue("@price", product.price);
+                cmd.Parameters.AddWithValue("@desc", product.descProduct);
+                cmd.Parameters.AddWithValue("@quantityStock", product.quantityStock);
+                cmd.Parameters.AddWithValue("@quantitySold", product.quantitySold);
+                cmd.Parameters.AddWithValue("@imageProduct", product.imageProduct);
+                int rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Cập nhật thông tin sản phẩm thành công.";
+                }
+            }
+            catch (Exception e)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Cập nhật sản phẩn thất bại. " + e.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return response;
+        }
     }
 }

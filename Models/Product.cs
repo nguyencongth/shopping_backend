@@ -11,6 +11,7 @@ namespace WebServiceShopping.Models
         public Decimal price { get; set; }
         public string descProduct { get; set; }
         public int quantityStock { get; set; }
+        public int quantitySold { get; set; }
         public DateTime dateAdded { get; set; }
         public string imageProduct { get; set; }
     }

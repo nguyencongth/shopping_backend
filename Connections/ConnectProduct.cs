@@ -56,6 +56,56 @@ namespace WebServiceShopping.Connections
             return response;
         }
 
+        public Response getProductAdmin(SqlConnection connection)
+        {
+            Response response = new Response();
+            connection.Open();
+            SqlCommand cmd = new SqlCommand("getProductAdmin", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            adapter.Fill(dt);
+            connection.Close();
+
+            List<Product> products = new List<Product>();
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    Product product = new Product();
+                    product.productId = Convert.ToInt32(dt.Rows[i]["productId"]);
+                    product.categoryId = Convert.ToInt32(dt.Rows[i]["categoryId"]);
+                    product.productName = Convert.ToString(dt.Rows[i]["productName"]);
+                    product.entryPrice = Convert.ToDecimal(dt.Rows[i]["entryPrice"]);
+                    product.price = Convert.ToDecimal(dt.Rows[i]["price"]);
+                    product.descProduct = Convert.ToString(dt.Rows[i]["descProduct"]);
+                    product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
+                    product.quantitySold = Convert.ToInt32(dt.Rows[i]["quantitySold"]);
+                    product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
+                    product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+
+                    products.Add(product);
+                }
+            }
+
+            if (products.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Danh sách sản phẩm";
+                response.arrayProduct = products;
+            }
+            else
+            {
+                response.StatusCode = 100;
+                response.StatusMessage = "Không tìm thấy sản phẩm nào!";
+                response.arrayProduct = null;
+            }
+
+            return response;
+        }
+
         public Response productAll(SqlConnection connection, int priceRange, int page, int pageSize)
         {
             Response response = new Response();

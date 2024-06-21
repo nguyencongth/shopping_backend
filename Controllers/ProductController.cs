@@ -102,5 +102,16 @@ namespace WebServiceShopping.Controllers
             response = connectProduct.FilterProductsByPrice(connection, priceRange, page, pageSize);
             return response;
         }
+
+        [HttpGet]
+        [Route("getProductAdmin")]
+        public Response getProductAdmin()
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.getProductAdmin(connection);
+            return response;
+        }
     }
 }

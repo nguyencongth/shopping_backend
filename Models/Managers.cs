@@ -8,5 +8,5 @@ public class Managers
     public string phoneNumber { get; set;}
     public string password { get; set;}
     public int roleId { get; set; }
-    public string roleName { get; set; }
+    //public string roleName { get; set; }
 }

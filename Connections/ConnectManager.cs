@@ -140,7 +140,7 @@ public class ConnectManager
                 manager.phoneNumber = Convert.ToString(dt.Rows[i]["phoneNumber"]);
                 manager.password = Convert.ToString(dt.Rows[i]["password_hash"]);
                 manager.roleId = Convert.ToInt32(dt.Rows[i]["roleId"]);
-                manager.roleName = Convert.ToString(dt.Rows[i]["roleName"]);
+                //manager.roleName = Convert.ToString(dt.Rows[i]["roleName"]);
                 managers.Add(manager);
             }
         }

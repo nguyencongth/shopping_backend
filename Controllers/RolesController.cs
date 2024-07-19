@@ -4,7 +4,8 @@ using WebServiceShopping.Connections;
 using WebServiceShopping.Models;
 
 namespace WebServiceShopping.Controllers;
-
+[Route("api/[controller]")]
+[ApiController]
 public class RolesController : Controller
 {
     private readonly IConfiguration _configuration; // Khởi tạo cấu hình và tên cấu hình

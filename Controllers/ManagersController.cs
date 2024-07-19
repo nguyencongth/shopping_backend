@@ -81,4 +81,15 @@ public class ManagersController : Controller
         response = connectManager.resetPassword(connection, managerId);
         return response;
     }
+    
+    [HttpGet]
+    [Route("getStaffById")]
+    public Response getStaffById(int managerId)
+    {
+        Response response = new Response();
+        ConnectManager connectManager = new ConnectManager();
+        SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+        response = connectManager.getStaffInfoById(connection, managerId);
+        return response;
+    }
 }

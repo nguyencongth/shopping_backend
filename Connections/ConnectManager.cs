@@ -243,4 +243,55 @@ public class ConnectManager
 
         return response;
     }
+
+    public Response getStaffInfoById(SqlConnection connection, int staffId)
+    {
+        Response response = new Response();
+        try
+        {
+            connection.Open();
+            SqlCommand getStaffById = new SqlCommand("sp_getInfoStaffById", connection);
+            getStaffById.CommandType = CommandType.StoredProcedure;
+            getStaffById.Parameters.AddWithValue("@staffId", staffId);
+
+            SqlDataAdapter adapter = new SqlDataAdapter(getStaffById);
+
+            DataTable dataTable = new DataTable();
+
+            adapter.Fill(dataTable);
+
+
+            List<Managers> arrayManager = new List<Managers>();
+
+            if (dataTable.Rows.Count > 0)
+            {
+                for (int i = 0; i < dataTable.Rows.Count; i++)
+                {
+                    Managers manager = new Managers();
+                    manager.managerId = Convert.ToInt32(dataTable.Rows[i]["managerId"]);
+                    manager.fullName = Convert.ToString(dataTable.Rows[i]["fullName"]);
+                    manager.email = Convert.ToString(dataTable.Rows[i]["email"]);
+                    manager.phoneNumber = Convert.ToString(dataTable.Rows[i]["phoneNumber"]);
+                    manager.password = Convert.ToString(dataTable.Rows[i]["password_hash"]);
+                    arrayManager.Add(manager);
+                }
+            }
+            if (arrayManager.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Thông tin nhân viên.";
+                response.arrayManager = arrayManager;
+            }
+        }
+        catch (Exception ex)
+        {
+            response.StatusCode = 400;
+            response.StatusMessage = "Lấy thông tin nhân viên thất bại." + ex.Message;
+        }
+        finally
+        {
+            connection.Close();
+        }
+        return response;
+    }
 }

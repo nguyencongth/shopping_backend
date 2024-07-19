@@ -7,6 +7,7 @@
         public string productName { get; set; }
         public string imageProduct { get; set; }
         public int quantity { get; set; }
+        public decimal price { get; set; }
         public decimal subtotal { get; set; }
     }
 }

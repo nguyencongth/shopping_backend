@@ -247,6 +247,7 @@ namespace WebServiceShopping.Connections
                         quantity = reader.GetInt32("quantity"),
                         subtotal = reader.GetDecimal("subtotal"),
                         productName = reader.GetString("productName"),
+                        price = reader.GetDecimal("price"),
                         imageProduct = reader.GetString("imageProduct")
                     });
                 }

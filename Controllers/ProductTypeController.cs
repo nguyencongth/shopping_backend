@@ -37,5 +37,38 @@ namespace WebServiceShopping.Controllers
             response = connectProductType.getCategoryById(connection, categoryId);
             return response;
         }
+        
+        [HttpPost]
+        [Route("addCategory")]
+        public Response creadeCategory(ProductType category)
+        {
+            Response response = new Response();
+            ConnectProductType connectProductType = new ConnectProductType();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProductType.createCategory(category, connection);
+            return response;
+        }
+        
+        [HttpPatch]
+        [Route("updateCategory")]
+        public Response updateCategory(ProductType category)
+        {
+            Response response = new Response();
+            ConnectProductType connectProductType = new ConnectProductType();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProductType.updateCategory(category, connection);
+            return response;
+        }
+        
+        [HttpDelete]
+        [Route("deleteCategory")]
+        public Response deleteCategory(int categoryId)
+        {
+            Response response = new Response();
+            ConnectProductType connectProductType = new ConnectProductType();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProductType.deleteCategory(connection, categoryId);
+            return response;
+        }
     }
 }

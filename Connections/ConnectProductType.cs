@@ -84,5 +84,86 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
+        
+        public Response createCategory(ProductType category, SqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("sp_add_new_category", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@categoryName", category.categoryName);
+                int result = cmd.ExecuteNonQuery();
+                if (result > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Thêm danh mục sản phẩm thành công!";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Thêm danh mục sản phẩm thất bại!" + ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return response;
+        }
+        public Response updateCategory(ProductType category, SqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("sp_update_category", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@categoryId", category.categoryId);
+                cmd.Parameters.AddWithValue("@newCategoryName", category.categoryName);
+                int result = cmd.ExecuteNonQuery();
+                if (result > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Cập nhật danh mục sản phẩm thành công!";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Cập nhật danh mục sản phẩm thất bại!" + ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return response;
+        }
+
+        public Response deleteCategory(SqlConnection connection, int categoryId)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("sp_delete_category", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@categoryId", categoryId);
+                cmd.ExecuteNonQuery();
+                response.StatusCode = 200;
+                response.StatusMessage = "Xóa danh mục thành công";
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Xóa danh mục thất bại! " + ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return response;
+        }
     }
 }

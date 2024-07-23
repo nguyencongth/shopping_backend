@@ -663,5 +663,54 @@ namespace WebServiceShopping.Connections
 
             return response;
         }
+        public Response top5ProductsBestSelling(SqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                SqlCommand cmdTop5 = new SqlCommand("sp_top_5_products_best_selling", connection);
+                cmdTop5.CommandType = CommandType.StoredProcedure;
+                SqlDataAdapter adapter = new SqlDataAdapter(cmdTop5);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                List<Product> products = new List<Product>();
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        Product product = new Product();
+                        product.productId = Convert.ToInt32(dt.Rows[i]["productId"]);
+                        product.categoryId = Convert.ToInt32(dt.Rows[i]["categoryId"]);
+                        product.productName = Convert.ToString(dt.Rows[i]["productName"]);
+                        product.entryPrice = Convert.ToDecimal(dt.Rows[i]["entryPrice"]);
+                        product.price = Convert.ToDecimal(dt.Rows[i]["price"]);
+                        product.descProduct = Convert.ToString(dt.Rows[i]["descProduct"]);
+                        product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
+                        product.quantitySold = Convert.ToInt32(dt.Rows[i]["quantitySold"]);
+                        product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
+                        product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+
+                        products.Add(product);
+                    }
+                }
+                if (products.Count > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Danh sách top 5 sản phẩm bán chạy nhất";
+                    response.arrayProduct = products;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = ex.Message;
+            }
+            finally
+            {
+                connection.Close();  
+            }
+            return response;
+        }
     }
 }

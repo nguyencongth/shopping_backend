@@ -146,5 +146,16 @@ namespace WebServiceShopping.Controllers
             response = connectProduct.addNewProduct(products, connection);
             return response;
         }
+        
+        [HttpGet]
+        [Route("top5ProductsBestSelling")]
+        public Response top5ProductsBestSelling()
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.top5ProductsBestSelling(connection);
+            return response;
+        }
     }
 }

@@ -712,5 +712,45 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
+        public Response totalNumberOfProductsSoleInMonth(SqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                SqlCommand cmdTotal = new SqlCommand("sp_total_number_of_products_sold_in_1_month", connection);
+                cmdTotal.CommandType = CommandType.StoredProcedure;
+                SqlDataAdapter adapter = new SqlDataAdapter(cmdTotal);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                List<SalesData> data = new List<SalesData>();
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        SalesData saleData = new SalesData();
+                        saleData.month = Convert.ToInt32(dt.Rows[i]["Month"]);
+                        saleData.totalQuantitySold = Convert.ToInt32(dt.Rows[i]["TotalQuantitySold"]);
+                        data.Add(saleData);
+                    }
+                }
+                if (data.Count > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Tổng số lượng sản phẩm bán được trong các tháng";
+                    response.arraySalesData = data;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = ex.Message;
+            }
+            finally
+            {
+                connection.Close();  
+            }
+            return response;
+        }
     }
 }

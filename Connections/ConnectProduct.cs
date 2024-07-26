@@ -752,5 +752,46 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
+        public Response revenue(int year, SqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                SqlCommand cmdRevenue = new SqlCommand("sp_monthly_revenue", connection);
+                cmdRevenue.Parameters.AddWithValue("@Year", year);
+                cmdRevenue.CommandType = CommandType.StoredProcedure;
+                SqlDataAdapter adapter = new SqlDataAdapter(cmdRevenue);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                List<Revenue> data = new List<Revenue>();
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        Revenue re = new Revenue();
+                        re.month = Convert.ToInt32(dt.Rows[i]["Month"]);
+                        re.totalRevenue = Convert.ToDecimal(dt.Rows[i]["TotalRevenue"]);
+                        data.Add(re);
+                    }
+                }
+                if (data.Count > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Doanh thu hàng tháng";
+                    response.arrayRevenue = data;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = ex.Message;
+            }
+            finally
+            {
+                connection.Close();  
+            }
+            return response;
+        }
     }
 }

@@ -168,5 +168,16 @@ namespace WebServiceShopping.Controllers
             response = connectProduct.totalNumberOfProductsSoleInMonth(connection);
             return response;
         }
+        
+        [HttpGet]
+        [Route("totalRevenueInMonth")]
+        public Response totalRevenueInMonth(int year)
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.revenue(year,connection);
+            return response;
+        }
     }
 }

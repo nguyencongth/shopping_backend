@@ -17,6 +17,7 @@
         public Cart cart { get; set; }
         public List<Roles> roles { get; set; }
         public List<SalesData> arraySalesData  { get; set; }
+        public List<Revenue> arrayRevenue  { get; set; }
         public List<Orders> arrayOrders { get; set; }
         public Orders orders { get; set; }
         public List<OrderItem> arrayOrderItem { get; set; }

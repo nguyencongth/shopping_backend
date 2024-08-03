@@ -273,6 +273,7 @@ public class ConnectManager
                     manager.email = Convert.ToString(dataTable.Rows[i]["email"]);
                     manager.phoneNumber = Convert.ToString(dataTable.Rows[i]["phoneNumber"]);
                     manager.password = Convert.ToString(dataTable.Rows[i]["password_hash"]);
+                    manager.roleId = Convert.ToInt32(dataTable.Rows[i]["roleId"]);
                     arrayManager.Add(manager);
                 }
             }

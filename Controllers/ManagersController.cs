@@ -70,6 +70,17 @@ public class ManagersController : Controller
         response = connectManager.updateInfoStaff(managers, connection);
         return response;
     }
+    
+    [HttpPatch]
+    [Route("adminUpdateInfoStaff")]
+    public Response adminUpdateInfoStaff(Managers managers)
+    {
+        Response response = new Response();
+        ConnectManager connectManager = new ConnectManager();
+        SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+        response = connectManager.adminUpdateInfoStaff(managers, connection);
+        return response;
+    }
 
     [HttpPatch]
     [Route("resetPassword")]

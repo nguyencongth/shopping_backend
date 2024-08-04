@@ -214,6 +214,36 @@ public class ConnectManager
         
         return response;
     }
+    
+    public Response adminUpdateInfoStaff(Managers managers, SqlConnection connection)
+    {
+        Response response = new Response();
+        try
+        {
+            connection.Open();
+            SqlCommand cmd = new SqlCommand("sp_admin_update_info_staff", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@fullName", managers.fullName);
+            cmd.Parameters.AddWithValue("@email", managers.email);
+            cmd.Parameters.AddWithValue("@phoneNumber", managers.phoneNumber);
+            cmd.Parameters.AddWithValue("@roleId", managers.roleId);
+            cmd.Parameters.AddWithValue("@managerId", managers.managerId);
+            cmd.ExecuteNonQuery();
+            response.StatusCode = 200;
+            response.StatusMessage = "Cập nhật thông tin thành công.";
+        }
+        catch (Exception ex)
+        {
+            response.StatusCode = 400;
+            response.StatusMessage = "Cập nhật thông tin không thành công." + ex.Message;
+        }
+        finally
+        {
+            connection.Close();
+        }
+        
+        return response;
+    }
 
     public Response resetPassword(SqlConnection connection ,int id)
     {

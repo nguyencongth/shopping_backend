@@ -9,6 +9,8 @@
         public ProductType productType { get; set; }
         public List<Product> arrayProduct { get; set; }
         public Product product { get; set; }
+        
+        public List<Product> arrayProductNew { get; set; }
         public List<Customers> arrayCustomer { get; set; }
         public Customers customer { get; set; }
         public List<Managers> arrayManager { get; set; }

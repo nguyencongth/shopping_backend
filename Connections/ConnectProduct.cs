@@ -175,11 +175,80 @@ namespace WebServiceShopping.Connections
             return response;
         }
 
-        public Response getProductNew(SqlConnection connection)
+        public Response getProductNew(SqlConnection connection, int priceRange, int page, int pageSize)
         {
             Response response = new Response();
             connection.Open();
-            string query = "SELECT TOP 5 * FROM products ORDER BY dateAdded DESC;";
+            SqlCommand sql = new SqlCommand("sp_get_new_product", connection);
+            sql.CommandType = CommandType.StoredProcedure;
+
+            int startIndex = (page - 1) * pageSize;
+            sql.Parameters.AddWithValue("@priceRange", priceRange);
+            sql.Parameters.AddWithValue("@startIndex", startIndex);
+            sql.Parameters.AddWithValue("@pageSize", pageSize);
+
+            sql.Parameters.Add("@totalProducts", SqlDbType.Int).Direction = ParameterDirection.Output;
+
+            SqlDataAdapter adapter = new SqlDataAdapter(sql);
+
+            DataTable dt = new DataTable();
+
+            adapter.Fill(dt);
+
+            List<Product> products = new List<Product>();
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    Product product = new Product();
+                    product.productId = Convert.ToInt32(dt.Rows[i]["productId"]);
+                    product.categoryId = Convert.ToInt32(dt.Rows[i]["categoryId"]);
+                    product.productName = Convert.ToString(dt.Rows[i]["productName"]);
+                    product.entryPrice = Convert.ToDecimal(dt.Rows[i]["entryPrice"]);
+                    product.price = Convert.ToDecimal(dt.Rows[i]["price"]);
+                    product.descProduct = Convert.ToString(dt.Rows[i]["descProduct"]);
+                    product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
+                    product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
+                    product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+
+                    products.Add(product);
+                }
+            }
+
+            int totalProducts = Convert.ToInt32(sql.Parameters["@totalProducts"].Value);
+
+            PaginationInfo paginationInfo = new PaginationInfo
+            {
+                CurrentPage = page,
+                ItemsPerPage = pageSize,
+                TotalItems = totalProducts,
+                TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize)
+            };
+
+            if (products.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Danh sách tất cả sản phẩm";
+                response.arrayProductNew = products;
+                response.Pagination = paginationInfo;
+            }
+            else
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Không tìm thấy sản phẩm nào!";
+                response.arrayProductNew = null;
+                response.Pagination = null;
+            }
+
+            connection.Close();
+            return response;
+        }
+
+        public Response getProductNewHome(SqlConnection connection)
+        {
+            Response response = new Response();
+            connection.Open();
+            string query = "SELECT TOP 6 * FROM products ORDER BY dateAdded DESC;";
             SqlCommand cmd = new SqlCommand(query, connection);
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
 
@@ -224,8 +293,7 @@ namespace WebServiceShopping.Connections
             return response;
         }
 
-        public Response productByCategoryId(SqlConnection connection, int categoryId, int priceRange, int page,
-            int pageSize)
+        public Response productByCategoryId(SqlConnection connection, int categoryId, int priceRange, int page, int pageSize)
         {
             Response response = new Response();
             connection.Open();

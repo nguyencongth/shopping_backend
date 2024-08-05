@@ -51,12 +51,23 @@ namespace WebServiceShopping.Controllers
 
         [HttpGet]
         [Route("productNew")]
+        public Response getProductNew(int priceRange, int page, int pageSize)
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.getProductNew(connection, priceRange, page, pageSize);
+            return response;
+        }
+        
+        [HttpGet]
+        [Route("productNewHome")]
         public Response getProductNew()
         {
             Response response = new Response();
             ConnectProduct connectProduct = new ConnectProduct();
             SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
-            response = connectProduct.getProductNew(connection);
+            response = connectProduct.getProductNewHome(connection);
             return response;
         }
 

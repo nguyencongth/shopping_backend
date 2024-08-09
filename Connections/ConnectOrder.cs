@@ -15,6 +15,10 @@ namespace WebServiceShopping.Connections
                     SqlCommand OrderCmd = new SqlCommand("sp_create_order", connection);
                     OrderCmd.CommandType = CommandType.StoredProcedure;
                     OrderCmd.Parameters.AddWithValue("@IN_CustomerId", orders.customerId);
+                    OrderCmd.Parameters.AddWithValue("@userName", orders.userName);
+                    OrderCmd.Parameters.AddWithValue("@email", orders.email);
+                    OrderCmd.Parameters.AddWithValue("@phoneNumber", orders.phoneNumber);
+                    OrderCmd.Parameters.AddWithValue("@shippingAddress", orders.shippingAddress);
                     //OrderCmd.Parameters.AddWithValue("@IN_OrderDate", DateTime.Now);
                     OrderCmd.Parameters.AddWithValue("@IN_TotalAmount", 0);
                     OrderCmd.Parameters.AddWithValue("@IN_paymentMethod", orders.paymentMethod);
@@ -121,6 +125,10 @@ namespace WebServiceShopping.Connections
                             orderId = orderID,
                             customerId = reader.GetInt32("customerId"),
                             orderDate = reader.GetDateTime("orderDate"),
+                            userName = reader.GetString("userName"),
+                            email = reader.GetString("email"),
+                            phoneNumber = reader.GetString("phoneNumber"),
+                            shippingAddress = reader.GetString("shippingAddress"),
                             totalAmount = reader.GetDecimal("totalAmount"),
                             paymentMethod = reader.GetString("paymentMethod"),
                             orderStatus = reader.GetInt32("orderStatus"),
@@ -230,6 +238,10 @@ namespace WebServiceShopping.Connections
                         {
                             orderId = orderID,
                             customerId = reader.GetInt32("customerId"),
+                            userName = reader.GetString("userName"),
+                            email = reader.GetString("email"),
+                            phoneNumber = reader.GetString("phoneNumber"),
+                            shippingAddress = reader.GetString("shippingAddress"),
                             orderDate = reader.GetDateTime("orderDate"),
                             totalAmount = reader.GetDecimal("totalAmount"),
                             paymentMethod = reader.GetString("paymentMethod"),

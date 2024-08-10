@@ -70,6 +70,17 @@ namespace WebServiceShopping.Controllers
             response = connectProduct.getProductNewHome(connection);
             return response;
         }
+        
+        [HttpGet]
+        [Route("productSaleHome")]
+        public Response getProductSaleHome()
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.getProductSaleHome(connection);
+            return response;
+        }
 
         [HttpGet]
         [Route("productDress")]

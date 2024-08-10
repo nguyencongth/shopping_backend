@@ -42,7 +42,7 @@ namespace WebServiceShopping.Connections
                         Product product = GetProductInfo(connection, orderItem.productId);
                         if (product != null)
                         {
-                            decimal subtotal = product.price * orderItem.quantity;
+                            decimal subtotal = product.discountedPrice * orderItem.quantity;
                             orderItemCmd.Parameters.AddWithValue("@IN_subtotal", subtotal);
                             orderItem.subtotal = subtotal;
                         }
@@ -198,7 +198,7 @@ namespace WebServiceShopping.Connections
             Product product = null;
             using(SqlTransaction transaction = connection.BeginTransaction())
             {
-                SqlCommand cmd = new SqlCommand("SELECT * FROM products WHERE productId = @ProductId", connection, transaction);
+                SqlCommand cmd = new SqlCommand("SELECT *, price - (price * discountPercentage / 100) AS discountedPrice FROM products WHERE productId = @ProductId", connection, transaction);
                 cmd.Parameters.AddWithValue("@ProductId", productId);
 
                 using (SqlDataReader reader = cmd.ExecuteReader())
@@ -209,6 +209,8 @@ namespace WebServiceShopping.Connections
                         {
                             productId = reader.GetInt32("productId"),
                             price = reader.GetDecimal("price"),
+                            discountPercentage = reader.GetDecimal("discountPercentage"),
+                            discountedPrice = reader.GetDecimal("discountedPrice")
                         };
                     }
                 }

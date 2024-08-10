@@ -11,7 +11,8 @@
         public Decimal price { get; set; }
         public int quantity { get; set; }
         public DateTime dateAdded { get; set; }
-
+        public Decimal discountPercentage { get; set; }
+        public Decimal discountedPrice { get; set; }
 
     }
 }

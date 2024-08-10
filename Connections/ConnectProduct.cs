@@ -35,6 +35,8 @@ namespace WebServiceShopping.Connections
                     product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
                     product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
                     product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                    product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
+                    product.discountedPrice = Convert.ToDecimal(dt.Rows[i]["discountedPrice"]);
 
                     products.Add(product);
                 }
@@ -85,6 +87,8 @@ namespace WebServiceShopping.Connections
                     product.quantitySold = Convert.ToInt32(dt.Rows[i]["quantitySold"]);
                     product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
                     product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                    product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
+                    product.discountedPrice = Convert.ToDecimal(dt.Rows[i]["discountedPrice"]);
 
                     products.Add(product);
                 }
@@ -141,6 +145,8 @@ namespace WebServiceShopping.Connections
                     product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
                     product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
                     product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                    product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
+                    product.discountedPrice = Convert.ToDecimal(dt.Rows[i]["discountedPrice"]);
 
                     products.Add(product);
                 }
@@ -210,6 +216,8 @@ namespace WebServiceShopping.Connections
                     product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
                     product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
                     product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                    product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
+                    product.discountedPrice = Convert.ToDecimal(dt.Rows[i]["discountedPrice"]);
 
                     products.Add(product);
                 }
@@ -248,7 +256,7 @@ namespace WebServiceShopping.Connections
         {
             Response response = new Response();
             connection.Open();
-            string query = "SELECT TOP 6 * FROM products ORDER BY dateAdded DESC;";
+            string query = "SELECT TOP 6 *, price - (price * discountPercentage / 100) AS discountedPrice FROM products ORDER BY dateAdded DESC;";
             SqlCommand cmd = new SqlCommand(query, connection);
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
 
@@ -271,6 +279,59 @@ namespace WebServiceShopping.Connections
                     product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
                     product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
                     product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                    product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
+                    product.discountedPrice = Convert.ToDecimal(dt.Rows[i]["discountedPrice"]);
+
+                    products.Add(product);
+                }
+            }
+
+            if (products.Count > 0)
+            {
+                response.StatusCode = 200;
+                response.StatusMessage = "Danh sách sản phẩm mới nhất";
+                response.arrayProduct = products;
+            }
+            else
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = "Không tìm thấy sản phẩm nào!";
+                response.arrayProduct = null;
+            }
+
+            connection.Close();
+            return response;
+        }
+        public Response getProductSaleHome(SqlConnection connection)
+        {
+            Response response = new Response();
+            connection.Open();
+            string query = "SELECT TOP 6 *, price - (price * discountPercentage / 100) AS discountedPrice " +
+                           "FROM products WHERE discountPercentage != 0 ORDER BY dateAdded DESC;";
+            SqlCommand cmd = new SqlCommand(query, connection);
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            adapter.Fill(dt);
+
+            List<Product> products = new List<Product>();
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    Product product = new Product();
+                    product.productId = Convert.ToInt32(dt.Rows[i]["productId"]);
+                    product.categoryId = Convert.ToInt32(dt.Rows[i]["categoryId"]);
+                    product.productName = Convert.ToString(dt.Rows[i]["productName"]);
+                    product.entryPrice = Convert.ToDecimal(dt.Rows[i]["entryPrice"]);
+                    product.price = Convert.ToDecimal(dt.Rows[i]["price"]);
+                    product.descProduct = Convert.ToString(dt.Rows[i]["descProduct"]);
+                    product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
+                    product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
+                    product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                    product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
+                    product.discountedPrice = Convert.ToDecimal(dt.Rows[i]["discountedPrice"]);
 
                     products.Add(product);
                 }
@@ -329,6 +390,8 @@ namespace WebServiceShopping.Connections
                     product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
                     product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
                     product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                    product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
+                    product.discountedPrice = Convert.ToDecimal(dt.Rows[i]["discountedPrice"]);
 
                     products.Add(product);
                 }
@@ -533,6 +596,8 @@ namespace WebServiceShopping.Connections
                     product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
                     product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
                     product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                    product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
+                    product.discountedPrice = Convert.ToDecimal(dt.Rows[i]["discountedPrice"]);
 
                     products.Add(product);
                 }
@@ -601,6 +666,8 @@ namespace WebServiceShopping.Connections
                     product.quantityStock = Convert.ToInt32(dt.Rows[i]["quantityStock"]);
                     product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
                     product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                    product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
+                    product.discountedPrice = Convert.ToDecimal(dt.Rows[i]["discountedPrice"]);
 
                     products.Add(product);
                 }
@@ -677,6 +744,7 @@ namespace WebServiceShopping.Connections
                 cmd.Parameters.AddWithValue("@quantityStock", product.quantityStock);
                 cmd.Parameters.AddWithValue("@quantitySold", product.quantitySold);
                 cmd.Parameters.AddWithValue("@imageProduct", product.imageProduct);
+                cmd.Parameters.AddWithValue("@discount", product.discountPercentage);
                 int rowsAffected = cmd.ExecuteNonQuery();
                 if (rowsAffected > 0)
                 {
@@ -712,6 +780,7 @@ namespace WebServiceShopping.Connections
                 cmd.Parameters.AddWithValue("@quantityStock", product.quantityStock);
                 cmd.Parameters.AddWithValue("@quantitySold", product.quantitySold);
                 cmd.Parameters.AddWithValue("@imageProduct", product.imageProduct);
+                cmd.Parameters.AddWithValue("@discount", product.discountPercentage);
                 int rowsAffected = cmd.ExecuteNonQuery();
                 if (rowsAffected > 0)
                 {
@@ -758,6 +827,7 @@ namespace WebServiceShopping.Connections
                         product.quantitySold = Convert.ToInt32(dt.Rows[i]["quantitySold"]);
                         product.dateAdded = Convert.ToDateTime(dt.Rows[i]["dateAdded"]);
                         product.imageProduct = Convert.ToString(dt.Rows[i]["imageProduct"]);
+                        product.discountPercentage = Convert.ToDecimal(dt.Rows[i]["discountPercentage"]);
 
                         products.Add(product);
                     }

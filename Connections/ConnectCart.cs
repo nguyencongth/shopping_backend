@@ -151,7 +151,7 @@ namespace WebServiceShopping.Connections
             Response response = new Response();
             connection.Open();
             SqlCommand getCartItemCmd = new SqlCommand(
-                "SELECT cart.cartId, cart.customerId, cart.productId, cart.quantity, cart.dateAdded, products.imageProduct, products.productName, products.price " +
+                "SELECT cart.cartId, cart.customerId, cart.productId, cart.quantity, cart.dateAdded, products.imageProduct, products.productName, products.price, products.discountPercentage, price - (price * discountPercentage / 100) AS discountedPrice " +
                 "FROM cart " +
                 "INNER JOIN products ON cart.productId = products.productId " +
                 "WHERE cart.customerId = @customerId", connection);
@@ -177,6 +177,8 @@ namespace WebServiceShopping.Connections
                     cart.imageProduct = Convert.ToString(dataTable.Rows[i]["imageProduct"]);
                     cart.price = Convert.ToDecimal(dataTable.Rows[i]["price"]);
                     cart.quantity = Convert.ToInt32(dataTable.Rows[i]["quantity"]);
+                    cart.discountPercentage = Convert.ToDecimal(dataTable.Rows[i]["discountPercentage"]);
+                    cart.discountedPrice = Convert.ToDecimal(dataTable.Rows[i]["discountedPrice"]);
                     arrayCart.Add(cart);
                 }
             }

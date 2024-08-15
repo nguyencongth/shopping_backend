@@ -1,4 +1,6 @@
 ﻿using System.Data;
+using System.Net;
+using System.Net.Mail;
 using Microsoft.Data.SqlClient;
 using WebServiceShopping.Models;
 
@@ -58,6 +60,9 @@ namespace WebServiceShopping.Connections
                     
                     response.StatusCode = 200;
                     response.StatusMessage = "Thêm đơn hàng thành công";
+                    
+                    string emailBody = "Mã đơn hàng của bạn là: #" + orderID;
+                    SendMessageToEmail(orders.email, "Đơn hàng của bạn đã được đặt thành công.", emailBody);
                 }
                 catch (Exception ex)
                 {
@@ -170,6 +175,10 @@ namespace WebServiceShopping.Connections
             try
             {
                 connection.Open();
+                
+                SqlCommand getEmailCmd = new SqlCommand("SELECT email FROM orders WHERE orderId = @orderId", connection);
+                getEmailCmd.Parameters.AddWithValue("@orderId", orderId);
+                string customerEmail = (string)getEmailCmd.ExecuteScalar();
 
                 SqlCommand updateOrderStatus = new SqlCommand("UPDATE orders SET orderStatus = @newOrderStatus WHERE orderId = @orderId", connection);
                 updateOrderStatus.Parameters.AddWithValue("@orderId", orderId);
@@ -180,6 +189,9 @@ namespace WebServiceShopping.Connections
                 {
                     response.StatusCode = 200;
                     response.StatusMessage = "Cập nhật trạng thái đơn hàng thành công.";
+                    
+                    string emailBody = $"Đơn hàng #{orderId} của bạn đã được xác nhận. Vui lòng xác nhận đơn hàng khi nhận được hàng.";
+                    SendMessageToEmail(customerEmail, "Thông báo", emailBody);
                 }
             }
             catch (Exception ex)
@@ -280,6 +292,31 @@ namespace WebServiceShopping.Connections
             connection.Close();
             return response;
 
+        }
+        public void SendMessageToEmail(string toEmail, string subject, string body)
+        {
+
+            var fromAddress = new MailAddress("thanhnc279@gmail.com", "Thanhnc");
+            var toAddress = new MailAddress(toEmail, "To Name");
+            const string fromPassword = "yfagiawekhvcuism";
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+            };
+
+            using var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            };
+            smtp.Send(message);
+            //return 0;
         }
     }
 }

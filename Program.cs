@@ -7,11 +7,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Cho tất cả người dùng đều sử dụng được địa chỉ API này
-/*
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => 
     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
-*/
+
 builder.Services.AddCors(p => p.AddPolicy("MyCors", build => {
     build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
@@ -28,6 +26,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseSwagger();
+
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

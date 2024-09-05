@@ -273,6 +273,57 @@ public class ConnectManager
 
         return response;
     }
+    
+    public Response changePassword(int managerId, string currentPassword, string newPassword, string confirmNewPassword, SqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                SqlCommand checkPasswordCmd = new SqlCommand("Select password_hash From managers Where managerId = @managerId", connection);
+                checkPasswordCmd.Parameters.AddWithValue("@managerId", managerId);
+                string hashedPasswordFromDb = Convert.ToString(checkPasswordCmd.ExecuteScalar());
+                if (PasswordHelper.VerifyPassword(currentPassword, hashedPasswordFromDb))
+                {
+                    if (newPassword == confirmNewPassword)
+                    {
+                        string newHashedPassword = PasswordHelper.HashPassword(newPassword);
+                        SqlCommand updatePasswordCmd = new SqlCommand("Update managers SET password_hash = @NewPassword Where managerId = @managerId", connection);
+                        updatePasswordCmd.Parameters.AddWithValue("@NewPassword", newHashedPassword);
+                        updatePasswordCmd.Parameters.AddWithValue("@managerId", managerId);
+                        updatePasswordCmd.ExecuteNonQuery();
+
+                        response.StatusCode = 200;
+                        response.StatusMessage = "Thay đổi mật khẩu thành công";
+                    }
+                    else
+                    {
+                        response.StatusCode = 400;
+                        response.StatusMessage = "Mật khẩu xác nhận không chính xác";
+                    }
+                }
+                else
+                {
+                    response.StatusCode = 401;
+                    response.StatusMessage = "Mật khẩu hiện tại không chính xác";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = ex.Message;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+            connection.Close();
+            return response;
+        }
 
     public Response getStaffInfoById(SqlConnection connection, int staffId)
     {

@@ -341,7 +341,7 @@ namespace WebServiceShopping.Connections
 
             var fromAddress = new MailAddress("thanhnc279@gmail.com", "Thanhnc");
             var toAddress = new MailAddress(toEmail, "To Name");
-            const string fromPassword = "yfagiawekhvcuism";
+            const string fromPassword = "fumdjusbvzcpqpada123";
 
             var smtp = new SmtpClient
             {

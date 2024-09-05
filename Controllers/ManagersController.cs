@@ -93,6 +93,17 @@ public class ManagersController : Controller
         return response;
     }
     
+    [HttpPatch]
+    [Route("changePassword")]
+    public Response changePassword(int managerId, string currentPassword, string newPassword, string confirmNewPassword)
+    {
+        Response response = new Response();
+        ConnectManager connectManager = new ConnectManager();
+        SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+        response = connectManager.changePassword(managerId, currentPassword, newPassword, confirmNewPassword, connection);
+        return response;
+    }
+    
     [HttpGet]
     [Route("getStaffById")]
     public Response getStaffById(int managerId)

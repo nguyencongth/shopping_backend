@@ -1002,5 +1002,48 @@ namespace WebServiceShopping.Connections
             }
             return response;
         }
+        public Response dailyRevenue(int year, int month, int week, SqlConnection connection)
+        {
+            Response response = new Response();
+            try
+            {
+                connection.Open();
+                SqlCommand cmdDailyRevenue = new SqlCommand("sp_daily_revenue", connection);
+                cmdDailyRevenue.Parameters.AddWithValue("@Year", year);
+                cmdDailyRevenue.Parameters.AddWithValue("@Month", month);
+                cmdDailyRevenue.Parameters.AddWithValue("@Week", week);
+                cmdDailyRevenue.CommandType = CommandType.StoredProcedure;
+                SqlDataAdapter adapter = new SqlDataAdapter(cmdDailyRevenue);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                List<Revenue> data = new List<Revenue>();
+                if (dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        Revenue re = new Revenue();
+                        re.date = Convert.ToDateTime(dt.Rows[i]["Date"]);
+                        re.totalRevenue = Convert.ToDecimal(dt.Rows[i]["TotalRevenue"]);
+                        data.Add(re);
+                    }
+                }
+                if (data.Count > 0)
+                {
+                    response.StatusCode = 200;
+                    response.StatusMessage = "Doanh thu theo ngày";
+                    response.arrayRevenue = data;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 400;
+                response.StatusMessage = ex.Message;
+            }
+            finally
+            {
+                connection.Close();  
+            }
+            return response;
+        }
     }
 }

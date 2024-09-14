@@ -294,18 +294,18 @@ public class ConnectManager
                         updatePasswordCmd.ExecuteNonQuery();
 
                         response.StatusCode = 200;
-                        response.StatusMessage = "Thay đổi mật khẩu thành công";
+                        response.StatusMessage = "Change password successfully";
                     }
                     else
                     {
                         response.StatusCode = 400;
-                        response.StatusMessage = "Mật khẩu xác nhận không chính xác";
+                        response.StatusMessage = "Confirmation password is incorrect.";
                     }
                 }
                 else
                 {
                     response.StatusCode = 401;
-                    response.StatusMessage = "Mật khẩu hiện tại không chính xác";
+                    response.StatusMessage = "Current password is incorrect.";
                 }
 
             }

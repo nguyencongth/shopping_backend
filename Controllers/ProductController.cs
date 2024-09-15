@@ -212,5 +212,16 @@ namespace WebServiceShopping.Controllers
             response = connectProduct.revenue(year,connection);
             return response;
         }
+        
+        [HttpGet]
+        [Route("totalDailyRevenue")]
+        public Response totalDailyRevenue(int year, int month, int week)
+        {
+            Response response = new Response();
+            ConnectProduct connectProduct = new ConnectProduct();
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("webservice"));
+            response = connectProduct.dailyRevenue(year, month, week, connection);
+            return response;
+        }
     }
 }
